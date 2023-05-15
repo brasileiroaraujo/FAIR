@@ -352,7 +352,7 @@ def eval_to_json(accuracy, spd, eod):
     """
     data = {'accuracy': accuracy, 'SPD': spd, 'EOD': eod}
     json_string = json.dumps(data)
-    with open('data/json_data/evaluation_data.json', 'w+') as outfile:
+    with open('D:/IntelliJ_Workspace/fairER/web/data/json_data/evaluation_data.json', 'w+') as outfile:
         outfile.write(json_string)
 
 
@@ -372,7 +372,7 @@ def clusters_to_json(clusters):
     data = {"clusters": json_string}
 
     json_string = json.dumps(data)
-    with open('data/json_data/clusters_data.json', 'w+') as outfile:
+    with open('D:/IntelliJ_Workspace/fairER/web/data/json_data/clusters_data.json', 'w+') as outfile:
         outfile.write(json_string)
 
 
@@ -381,7 +381,7 @@ def preds_to_json(data_path):
         Writes the predictions to a json file.
     """
     csv_to_json(data_path + '/dm_results.csv',
-                'data/json_data/preds_data.json') 
+                'D:/IntelliJ_Workspace/fairER/web/data/json_data/preds_data.json')
 
 
 

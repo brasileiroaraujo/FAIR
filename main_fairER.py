@@ -93,7 +93,7 @@ def main(data_path, train_file, valid_file, test_file, explanation):
 if __name__ == '__main__':
     args = len(sys.argv) > 5
 
-    datasets_path = sys.argv[1] if args else os.path.join('resources','Datasets','Beer')
+    datasets_path = sys.argv[1] if args else os.path.join('resources','Datasets','DBLP-ACM')
     
     train_file = sys.argv[2] if args else 'joined_train.csv'
     valid_file = sys.argv[3] if args else 'joined_valid.csv'
