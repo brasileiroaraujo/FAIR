@@ -5,7 +5,7 @@ import util
 import pandas as pd
 from clustering import fair_unique_mapping_clustering as fumc
 import sys
-sys.path.append(sys.path.abspath('C:\\Users\\admin\\IntelliJ_Workspace'))
+# sys.path.append(sys.path.abspath('C:\\Users\\admin\\IntelliJ_Workspace'))
 import matcher
 
 
@@ -14,6 +14,9 @@ import web.library.methods as methods
 
 def open_ditto_result(path):
     df = pd.read_json(path_or_buf=path, lines=True)
+
+    if df.empty:
+        return df
 
     df = pd.concat([df,extractLeftColumns(df)], axis=1)
     df = df.drop(axis=1, columns=["left"])
@@ -129,14 +132,56 @@ def run_streaming(data, data_frame, nextProtected, k_results):
 
     return clusters, preds, nextProtected
 
+def cartesian_product(source, target):
+    format_source = []
+    for row_source in source.to_dict(orient='records'):
+        content_source = ""
+        for attr_source in row_source.keys():
+            content_source += 'COL %s VAL %s ' % (attr_source, row_source[attr_source])
+        format_source.append(content_source)
 
-def run_matching_ranking_streaming(data, data_frame, nextProtected, k_results):
+    format_target = []
+    for row_target in target.to_dict(orient='records'):
+        content_target = ""
+        for attr_target in row_target.keys():
+            content_target += 'COL %s VAL %s ' % (attr_target, row_target[attr_target])
+        format_target.append(content_target)
+
+    #return the pairs (cartesian among the lines)
+    return [[s,t] for s in format_source for t in format_target]
+
+
+def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results):
     ###########
     # Matching with Ditto
     ###########
     print("--- Matching with Ditto ...  ---")
-    matcher.run_matcher(task="Structured/Beer", input_path="data/er_magellan/Structured/Beer/test.txt", output_path="output/output_small_test_fair.jsonl", lm="roberta", checkpoint_path="checkpoints/")
+    path_matches = "output/output_small_test_fair.jsonl"
+    #organizing the pairs (to be compared)
+    # input_dataframe = cartesian_product(source, target)
 
+    #sending the pairs to be matched
+    matcher.run_matcher_streaming(task="Structured/Beer", input_dataframe=list_of_pairs, output_path=path_matches, lm="roberta", checkpoint_path="checkpoints/")
+
+    print("--- SAFER Ranking ...  ---")
+    preds = open_ditto_result(path_matches)
+    clusters = []
+
+    if len(preds) > 0:
+        preds = preds.sort_values(by='match_score', ascending=False)
+
+        initial_pairs = [(a.left_Beer_Name, a.right_Beer_Name, a.match_score, util.pair_is_protected(a, "Beer", False))
+                         for a in preds.itertuples(index=False)] #Ditto
+
+        k_results = 20
+        clusters = fumc.run_steraming(initial_pairs, True, k_results)
+        print("\nclustering results:\n", clusters)
+        return clusters, preds, nextProtected
+
+    else:
+        print("\nNo matches detected.\n")
+
+    return clusters, preds, nextProtected
 
 
 

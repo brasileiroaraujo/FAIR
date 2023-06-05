@@ -32,7 +32,7 @@ def receipt(err,msg):
 #####################
 print('Kafka Producer has been initiated...')
 
-BASE_PATH = "D:\\IntelliJ_Workspace\\fairER\\resources\\Datasets"
+BASE_PATH = "D:/IntelliJ_Workspace/fairER/resources/Datasets"
 
 def open_ditto_result(path):
     df = pd.read_json(path_or_buf=path, lines=True)
@@ -74,36 +74,59 @@ def extractRightColumns(df):
 def open_csv(path):
     return pd.read_csv(path)
 
+def cartesian_product(source, target):
+    format_source = []
+    for row_source in source.to_dict(orient='records'):
+        content_source = ""
+        for attr_source in row_source.keys():
+            content_source += 'COL %s VAL %s ' % (attr_source, row_source[attr_source])
+        format_source.append(content_source)
+
+    format_target = []
+    for row_target in target.to_dict(orient='records'):
+        content_target = ""
+        for attr_target in row_target.keys():
+            content_target += 'COL %s VAL %s ' % (attr_target, row_target[attr_target])
+        format_target.append(content_target)
+
+    #return the pairs (cartesian among the lines)
+    return [s + "SEPARATOR" + t for s in format_source for t in format_target]
 
 def main():
     p = Producer({'bootstrap.servers':'localhost:9092'})
 
-    source = open_csv(BASE_PATH + '\\Beer\\tableA.csv')
-    target = open_csv(BASE_PATH + '\\Beer\\tableB.csv')
+    source = open_csv(BASE_PATH + '\\Beer\\tableA_sample.csv')
+    target = open_csv(BASE_PATH + '\\Beer\\tableB_sample.csv')
     init = 0
-    n_batches = 19
-    dataset_size = len(source.index) - 1
+    n_batches = 9
+    window = n_batches - init
+    source_size = len(source.index) - 1
+    target_size = len(target.index) - 1
+    dataset_size = max(source_size, target_size)
 
-    while (not source.empty and n_batches < dataset_size):#for i in range(0,len(preds.index)):
+    while ((not source.empty) and (not target.empty) and (init < source_size and init < target_size)):#for i in range(0,len(preds.index)):
         # line = preds.loc[0]#.to_json()
-        lines = source.loc[init:n_batches]
+        lines_s = source.loc[init:min(n_batches, source_size)]
+        lines_t = target.loc[init:min(n_batches, target_size)]
+
+        pairs = cartesian_product(lines_s, lines_t)
 
         # print(lines.loc[0].to_json())
 
-        for i in range(init,n_batches+1):
-            # p.poll(1)
-            line = lines.loc[i].to_json()
+        for line in pairs:#for i in range(init,n_batches+1):
+            p.poll(1)
+            #line = pairs[i]#.loc[i].to_json()
             print(line)
-            # p.produce('user-tracker', line.encode('utf-8'),callback=receipt)
-        # p.flush()
+            p.produce('safer', line.encode('utf-8'),callback=receipt)
+        p.flush()
 
-        window = n_batches - init
-        init = n_batches
-        n_batches = n_batches + (window) if (n_batches + (window) < len(source.index)) else dataset_size
-        print(n_batches)
+        init = n_batches + 1
+        n_batches = init + (window) #if (n_batches + (window) < len(source.index)) else dataset_size
+        print("source size: " + str(len(lines_s.index)))
+        print("target size: " + str(len(lines_t.index)))
         # n_batches = n_batches + (window)
 
-        time.sleep(2)
+        time.sleep(15)
 
 
         # for i in range(0,len(preds.index)):

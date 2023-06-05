@@ -60,7 +60,7 @@ def match_streaming(data, data_frame, nextProtected):
 
     return clusters, preds, av_time, nextProtected
 
-def match_rank_streaming(data, data_frame, nextProtected):
+def match_rank_streaming(data, list_of_pairs, nextProtected):
     k = 20
     print('\n', 'Streaming processing ... ' + data, '\n')
     # data_path = os.path.join(BASE_PATH, 'resources','Datasets',data)
@@ -68,7 +68,7 @@ def match_rank_streaming(data, data_frame, nextProtected):
     av_time = 0
     # for _ in range(10):
     start_time = time.time()
-    clusters, preds, nextProtected = run_matching_ranking_streaming(data, data_frame, nextProtected, k)
+    clusters, preds, nextProtected = run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k)
     ex_time = time.time() - start_time
     av_time += ex_time
 
