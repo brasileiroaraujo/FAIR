@@ -73,7 +73,7 @@ def extractRightColumns(df):
 
 
 def open_csv(path):
-    return pd.read_csv(path)
+    return pd.read_csv(path, header=None, sep='\n')
 
 def cartesian_product(source, target):
     format_source = []
@@ -96,7 +96,7 @@ def cartesian_product(source, target):
 def main():
     p = Producer({'bootstrap.servers':'localhost:9092'})
 
-    pairs_to_compare = open_csv(BASE_PATH + 'Beer/test.txt')
+    pairs_to_compare = open_csv(BASE_PATH + 'Beer/test.txt')#'Beer/test.txt')
     init = 0
     n_batches = 29
     window = n_batches - init
@@ -118,7 +118,7 @@ def main():
         print("pairs size: " + str(len(lines.index)))
         # n_batches = n_batches + (window)
 
-        time.sleep(10)
+        time.sleep(250)
 
     # m=json.dumps(data)
 

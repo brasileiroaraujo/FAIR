@@ -1,3 +1,5 @@
+import time
+
 from matching import run_deepmatcher as dm
 from matching import run_deepmatcher_w_mojito as dmm
 import os
@@ -12,42 +14,71 @@ import matcher
 import web.library.methods as methods
 
 
-def open_ditto_result(path):
+def open_ditto_result(path, data):
     df = pd.read_json(path_or_buf=path, lines=True)
 
     if df.empty:
         return df
 
-    df = pd.concat([df,extractLeftColumns(df)], axis=1)
+    df = pd.concat([df,extractLeftColumns(df, data)], axis=1)
     df = df.drop(axis=1, columns=["left"])
 
-    df = pd.concat([df,extractRightColumns(df)], axis=1)
+    df = pd.concat([df,extractRightColumns(df, data)], axis=1)
     df = df.drop(axis=1, columns=["right"])
 
     df.rename(columns={"match_confidence": 'match_score', "match": 'label'}, inplace=True)
     return df
 
-def extractLeftColumns(df):
+def extractLeftColumns(df, data):
     df_splited = df.left.str.split("COL", expand=True)
     df_splited = df_splited.drop(axis=1, columns=[0])
-    df_splited.rename(columns={1: 'left_Beer_Name', 2: 'left_Brew_Factory_Name', 3: 'left_Style', 4: 'left_ABV'}, inplace=True)
 
-    df_splited['left_Beer_Name'] = df_splited['left_Beer_Name'].str.split("VAL", expand=True)[1]
-    df_splited['left_Brew_Factory_Name'] = df_splited['left_Brew_Factory_Name'].str.split("VAL", expand=True)[1]
-    df_splited['left_Style'] = df_splited['left_Style'].str.split("VAL", expand=True)[1]
-    df_splited['left_ABV'] = df_splited['left_ABV'].str.split("VAL", expand=True)[1]
+    if data == 'Beer':
+        df_splited.rename(columns={1: 'left_Beer_Name', 2: 'left_Brew_Factory_Name', 3: 'left_Style', 4: 'left_ABV'}, inplace=True)
+        df_splited['left_Beer_Name'] = df_splited['left_Beer_Name'].str.split("VAL", expand=True)[1]
+        df_splited['left_Brew_Factory_Name'] = df_splited['left_Brew_Factory_Name'].str.split("VAL", expand=True)[1]
+        df_splited['left_Style'] = df_splited['left_Style'].str.split("VAL", expand=True)[1]
+        df_splited['left_ABV'] = df_splited['left_ABV'].str.split("VAL", expand=True)[1]
+    elif data == 'Amazon-Google':
+        df_splited.rename(columns={1: 'left_title', 2: 'left_manufacturer', 3: 'left_price'}, inplace=True)
+        df_splited['left_title'] = df_splited['left_title'].str.split("VAL", expand=True)[1]
+        df_splited['left_manufacturer'] = df_splited['left_manufacturer'].str.split("VAL", expand=True)[1]
+        df_splited['left_price'] = df_splited['left_price'].str.split("VAL", expand=True)[1]
+    elif data == 'DBLP-ACM':
+        df_splited.rename(columns={1: 'left_title', 2: 'left_authors', 3: 'left_venue', 4: 'left_year'}, inplace=True)
+        df_splited['left_title'] = df_splited['left_title'].str.split("VAL", expand=True)[1]
+        df_splited['left_authors'] = df_splited['left_authors'].str.split("VAL", expand=True)[1]
+        df_splited['left_venue'] = df_splited['left_venue'].str.split("VAL", expand=True)[1]
+        df_splited['left_year'] = df_splited['left_year'].str.split("VAL", expand=True)[1]
+
+    # for i in range(1, len(df_splited.columns) + 1):
+    #     df_splited['l_' + str(i)] = df_splited[i].str.split("VAL", expand=True)[1]
+    #     df_splited = df_splited.drop(axis=1, columns=[i])
+
 
     return df_splited
 
-def extractRightColumns(df):
+def extractRightColumns(df, data):
     df_splited = df.right.str.split("COL", expand=True)
     df_splited = df_splited.drop(axis=1, columns=[0])
-    df_splited.rename(columns={1: 'right_Beer_Name', 2: 'right_Brew_Factory_Name', 3: 'right_Style', 4: 'right_ABV'}, inplace=True)
 
-    df_splited['right_Beer_Name'] = df_splited['right_Beer_Name'].str.split("VAL", expand=True)[1]
-    df_splited['right_Brew_Factory_Name'] = df_splited['right_Brew_Factory_Name'].str.split("VAL", expand=True)[1]
-    df_splited['right_Style'] = df_splited['right_Style'].str.split("VAL", expand=True)[1]
-    df_splited['right_ABV'] = df_splited['right_ABV'].str.split("VAL", expand=True)[1]
+    if data == 'Beer':
+        df_splited.rename(columns={1: 'right_Beer_Name', 2: 'right_Brew_Factory_Name', 3: 'right_Style', 4: 'right_ABV'}, inplace=True)
+        df_splited['right_Beer_Name'] = df_splited['right_Beer_Name'].str.split("VAL", expand=True)[1]
+        df_splited['right_Brew_Factory_Name'] = df_splited['right_Brew_Factory_Name'].str.split("VAL", expand=True)[1]
+        df_splited['right_Style'] = df_splited['right_Style'].str.split("VAL", expand=True)[1]
+        df_splited['right_ABV'] = df_splited['right_ABV'].str.split("VAL", expand=True)[1]
+    elif data == 'Amazon-Google':
+        df_splited.rename(columns={1: 'right_title', 2: 'right_manufacturer', 3: 'right_price'}, inplace=True)
+        df_splited['right_title'] = df_splited['right_title'].str.split("VAL", expand=True)[1]
+        df_splited['right_manufacturer'] = df_splited['right_manufacturer'].str.split("VAL", expand=True)[1]
+        df_splited['right_price'] = df_splited['right_price'].str.split("VAL", expand=True)[1]
+    elif data == 'DBLP-ACM':
+        df_splited.rename(columns={1: 'right_title', 2: 'right_authors', 3: 'right_venue', 4: 'right_year'}, inplace=True)
+        df_splited['right_title'] = df_splited['right_title'].str.split("VAL", expand=True)[1]
+        df_splited['right_authors'] = df_splited['right_authors'].str.split("VAL", expand=True)[1]
+        df_splited['right_venue'] = df_splited['right_venue'].str.split("VAL", expand=True)[1]
+        df_splited['right_year'] = df_splited['right_year'].str.split("VAL", expand=True)[1]
 
     return df_splited
 
@@ -151,7 +182,7 @@ def cartesian_product(source, target):
     return [[s,t] for s in format_source for t in format_target]
 
 
-def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results):
+def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results, config, model, threshold, summarizer, dk_injector, lm):
     ###########
     # Matching with Ditto
     ###########
@@ -161,25 +192,33 @@ def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results
     # input_dataframe = cartesian_product(source, target)
 
     #sending the pairs to be matched
-    matcher.run_matcher_streaming(task="Structured/Beer", input_dataframe=list_of_pairs, output_path=path_matches, lm="roberta", checkpoint_path="checkpoints/")
+    start_time = time.time()
+    matcher.run_matcher_streaming2(input_dataframe=list_of_pairs, output_path=path_matches, config=config, model=model, threshold=threshold, summarizer=summarizer, dk_injector=dk_injector, lm=lm) #, lm="roberta", checkpoint_path="checkpoints/")
+    print('Time to match: ' + str(time.time() - start_time))
 
+
+    ###########
+    # Ranking
+    ###########
     print("--- SAFER Ranking ...  ---")
-    preds = open_ditto_result(path_matches)
+    start_time = time.time()
+    preds = open_ditto_result(path_matches, data)
     clusters = []
 
     if len(preds) > 0:
         preds = preds.sort_values(by='match_score', ascending=False)
 
-        initial_pairs = [(a.left_Beer_Name, a.right_Beer_Name, a.match_score, util.pair_is_protected(a, "Beer", False))
+        initial_pairs = [(a.left_Beer_Name, a.right_Beer_Name, a.match_score, util.pair_is_protected(a, data, False))
                          for a in preds.itertuples(index=False)] #Ditto
 
-        k_results = 20
         clusters = fumc.run_steraming(initial_pairs, True, k_results)
         print("\nclustering results:\n", clusters)
-        return clusters, preds, nextProtected
+        #return clusters, preds, nextProtected
 
     else:
         print("\nNo matches detected.\n")
+
+    print('Time to rank: ' + str(time.time() - start_time))
 
     return clusters, preds, nextProtected
 

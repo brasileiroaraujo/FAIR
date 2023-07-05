@@ -6,20 +6,8 @@ import logging
 import sys
 import random
 import pandas as pd
+from blocking import token_blocking
 
-# fake=Faker()
-#
-# logging.basicConfig(format='%(asctime)s %(message)s',
-#                     datefmt='%Y-%m-%d %H:%M:%S',
-#                     filename='producer.log',
-#                     filemode='w')
-#
-# logger = logging.getLogger()
-# logger.setLevel(logging.INFO)
-
-
-
-#####################
 
 def receipt(err,msg):
     if err is not None:
@@ -92,13 +80,30 @@ def cartesian_product(source, target):
     #return the pairs (cartesian among the lines)
     return [s + "SEPARATOR" + t for s in format_source for t in format_target]
 
+def configure_line(id_kb, kb):
+    format_source = []
+    tokens = set()
+    for row_source in kb.to_dict(orient='records'):
+        content_source = ""
+        for attr_source in row_source.keys():
+            content_source += 'COL %s VAL %s ' % (attr_source, row_source[attr_source])
+            tokens = tokens.union(set(token_blocking.extract_tokens(row_source[attr_source])))
+        tokens = token_blocking.extract_tokens(str(tokens)) #organize the top-5 tokens
+        format_source.append(content_source + ' TOKEN ' + str(tokens).replace("[", "").replace("]",""))
+        tokens = set()
+
+    return [str(id_kb) + s for s in format_source]
+
 def main():
     p = Producer({'bootstrap.servers':'localhost:9092'})
 
-    source = open_csv(BASE_PATH + '\\Beer\\tableA_sample.csv')
-    target = open_csv(BASE_PATH + '\\Beer\\tableB_sample.csv')
+    source = open_csv(BASE_PATH + '\\Beer\\tableA_test.csv')
+    source = source.drop(['id'], axis=1) #id will ignore for ditto
+    target = open_csv(BASE_PATH + '\\Beer\\tableB_test.csv')
+    target = target.drop(['id'], axis=1) #id will ignore for ditto
+
     init = 0
-    n_batches = 9
+    n_batches = 90
     window = n_batches - init
     source_size = len(source.index) - 1
     target_size = len(target.index) - 1
@@ -106,14 +111,15 @@ def main():
 
     while ((not source.empty) and (not target.empty) and (init < source_size and init < target_size)):#for i in range(0,len(preds.index)):
         # line = preds.loc[0]#.to_json()
-        lines_s = source.loc[init:min(n_batches, source_size)]
-        lines_t = target.loc[init:min(n_batches, target_size)]
+        lines_s = configure_line(1, source.loc[init:min(n_batches, source_size)])
+        lines_t = configure_line(2, target.loc[init:min(n_batches, target_size)])
 
-        pairs = cartesian_product(lines_s, lines_t)
+        # pairs = cartesian_product(lines_s, lines_t)
 
         # print(lines.loc[0].to_json())
+        entities_to_send = lines_s + lines_t
 
-        for line in pairs:#for i in range(init,n_batches+1):
+        for line in entities_to_send:#for i in range(init,n_batches+1):
             p.poll(1)
             #line = pairs[i]#.loc[i].to_json()
             print(line)
@@ -122,11 +128,11 @@ def main():
 
         init = n_batches + 1
         n_batches = init + (window) #if (n_batches + (window) < len(source.index)) else dataset_size
-        print("source size: " + str(len(lines_s.index)))
-        print("target size: " + str(len(lines_t.index)))
+        print("source size: " + str(len(lines_s)))
+        print("target size: " + str(len(lines_t)))
         # n_batches = n_batches + (window)
 
-        time.sleep(15)
+        time.sleep(60)
 
 
         # for i in range(0,len(preds.index)):

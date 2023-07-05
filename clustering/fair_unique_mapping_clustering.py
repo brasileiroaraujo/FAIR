@@ -60,7 +60,7 @@ def run_steraming(candidates, nextProtected, results_limit):
             continue
 
         # add pair to matches
-        matches.append([cand[0],cand[1]])
+        matches.append(cand)
         matched_ids_left.add(cand[0])
         matched_ids_right.add(cand[1])
 
