@@ -7,7 +7,7 @@ import util
 import pandas as pd
 from clustering import fair_unique_mapping_clustering as fumc
 import sys
-sys.path.insert(1, '/ditto')
+sys.path.insert(1, '../ditto')
 import matcher
 
 
