@@ -5,6 +5,7 @@ import evaluation.accuracy as eval
 import time
 from streaming.controller_fairER_streaming import match_streaming
 from streaming.controller_fairER_streaming import match_rank_streaming
+from gzip_files.gzip_matcher import gzip_matching_ranking
 import matcher
 
 ################
@@ -95,9 +96,9 @@ def main():
     list_of_pairs = []
     nextProtected = True
     k_ranking = 20
-    task = 'Beer'
+    task = 'DBLP-GoogleScholar'
     lm="roberta"
-    k_batch = 30
+    k_batch = 5742
     incremental_clusters = []
 
     config, model, threshold, summarizer, dk_injector = setUpDitto(task="Structured/" + task, lm=lm, checkpoint_path="checkpoints/")
@@ -118,13 +119,17 @@ def main():
             # print('row source:')
             # print(list_of_pairs)
 
+            #PERFORM DITTO
             clusters, preds, av_time, nextProtected = match_rank_streaming(task, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking)
+            # clusters = gzip_matching_ranking(list_of_pairs)
+
+            #RANKING
             incremental_clusters = merge_clusters(clusters, incremental_clusters, k_ranking)
             list_of_pairs = []
             # current_dataframe_source.drop(current_dataframe_source.index, inplace=True)
 
             print('clusters:')
-            print(incremental_clusters)
+            print(clusters)
 
 
     cs.close()

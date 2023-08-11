@@ -50,6 +50,8 @@ def extractLeftColumns(df, data):
         df_splited['left_authors'] = df_splited['left_authors'].str.split("VAL", expand=True)[1]
         df_splited['left_venue'] = df_splited['left_venue'].str.split("VAL", expand=True)[1]
         df_splited['left_year'] = df_splited['left_year'].str.split("VAL", expand=True)[1]
+    else:
+        print("NEED TO IMPLEMENT CONDITION")
 
     # for i in range(1, len(df_splited.columns) + 1):
     #     df_splited['l_' + str(i)] = df_splited[i].str.split("VAL", expand=True)[1]
@@ -79,6 +81,8 @@ def extractRightColumns(df, data):
         df_splited['right_authors'] = df_splited['right_authors'].str.split("VAL", expand=True)[1]
         df_splited['right_venue'] = df_splited['right_venue'].str.split("VAL", expand=True)[1]
         df_splited['right_year'] = df_splited['right_year'].str.split("VAL", expand=True)[1]
+    else:
+        print("NEED TO IMPLEMENT CONDITION")
 
     return df_splited
 
@@ -125,7 +129,11 @@ def run(data, data_path, train_file, valid_file, test_file, explanation, k_resul
     return clusters, preds
 
 
-
+def getKey(key):
+    map_data = {'Beer':'Beer_Name',
+                'Amazon-Google': 'title',
+                'DBLP-ACM': 'title'}
+    return map_data.get(key)
 
 def run_streaming(data, data_frame, nextProtected, k_results):
     ###########
@@ -149,7 +157,9 @@ def run_streaming(data, data_frame, nextProtected, k_results):
     # initial_pairs = [(int(a.id.split('_')[0]), int(a.id.split('_')[1]), a.match_score, util.pair_is_protected(a, data, False, explanation))
     #                  for a in preds.itertuples(index=False)] #FairEr
 
-    initial_pairs = [(a.left_Beer_Name, a.right_Beer_Name, a.match_score, util.pair_is_protected(a, data, False))
+    column_key = getKey(data)
+
+    initial_pairs = [(a.__getattribute__('left_' + column_key), a.__getattribute__('right_' + column_key), a.match_score, util.pair_is_protected(a, data, False))
                      for a in preds.itertuples(index=False)] #Ditto
 
     clusters, nextProtected = fumc.run_steraming(initial_pairs, nextProtected, k_results)
@@ -208,8 +218,11 @@ def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results
     if len(preds) > 0:
         preds = preds.sort_values(by='match_score', ascending=False)
 
-        initial_pairs = [(a.left_Beer_Name, a.right_Beer_Name, a.match_score, util.pair_is_protected(a, data, False))
+        column_key = getKey(data)
+
+        initial_pairs = [(a.__getattribute__('left_' + column_key), a.__getattribute__('right_' + column_key), a.match_score, util.pair_is_protected(a, data, False))
                          for a in preds.itertuples(index=False)] #Ditto
+
 
         clusters = fumc.run_steraming(initial_pairs, True, k_results)
         print("\nclustering results:\n", clusters)
