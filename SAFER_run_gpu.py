@@ -1,13 +1,8 @@
 import sys
 
-from confluent_kafka import Consumer
 import pandas as pd
-import json
-import evaluation.accuracy as eval
 import time
-from streaming.controller_fairER_streaming import match_streaming
 from streaming.controller_fairER_streaming import match_rank_streaming
-from gzip_files.gzip_matcher import gzip_matching_ranking
 import matcher
 
 
