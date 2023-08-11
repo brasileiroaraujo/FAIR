@@ -132,7 +132,10 @@ def run(data, data_path, train_file, valid_file, test_file, explanation, k_resul
 def getKey(key):
     map_data = {'Beer':'Beer_Name',
                 'Amazon-Google': 'title',
-                'DBLP-ACM': 'title'}
+                'DBLP-ACM': 'title',
+                'DBLP-GoogleScholar': 'title',
+                'iTunes-Amazon': 'Song_Name',
+                'Walmart-Amazon': 'title'}
     return map_data.get(key)
 
 def run_streaming(data, data_frame, nextProtected, k_results):
