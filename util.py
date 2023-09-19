@@ -44,7 +44,9 @@ default_conditions = {'Amazon-Google': "('microsoft' in str(tuple.left_manufactu
                       'DBLP-GoogleScholar': "('vldb j' in str(tuple.left_venue)) or ('vldb j' in str(tuple.right_venue))",
                       'Fodors-Zagats': "('asian' == str(tuple.left_entity_type)) or ('asian' == str(tuple.right_entity_type))",
                       'iTunes-Amazon': "('Dance' in str(tuple.left_Genre)) or ('Dance' in str(tuple.right_Genre))",
-                      'Walmart-Amazon': "('printers' in str(tuple.left_category)) or ('printers' in str(tuple.right_category))"}
+                      'Walmart-Amazon': "('printers' in str(tuple.left_category)) or ('printers' in str(tuple.right_category)) "
+                                        "or ('laptop' in str(tuple.left_category)) or ('laptop' in str(tuple.right_category))"
+                                        "or ('monitors' in str(tuple.left_category)) or ('monitors' in str(tuple.right_category))"}
 
 
 default_conditions_w_exp = {'Amazon-Google': "('microsoft' in str(tuple.ltable_manufacturer)) or ('microsoft' in str(tuple.rtable_manufacturer))",
