@@ -96,9 +96,9 @@ def cartesian_product(source, target):
 def main():
     p = Producer({'bootstrap.servers':'localhost:9092'})
 
-    pairs_to_compare = open_csv(BASE_PATH + 'DBLP-GoogleScholar/test.txt')#'Beer/test.txt')
+    pairs_to_compare = open_csv(BASE_PATH + 'Beer/test.txt')#'Beer/test.txt')
     init = 0
-    n_batches = 5741
+    n_batches = 90
     window = n_batches - init
     pair_size = len(pairs_to_compare.index) - 1
 

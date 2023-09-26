@@ -45,7 +45,7 @@ def run_steraming(candidates, nextProtected, results_limit):
     matches = []
 
     protected_candidates = [x for x in candidates if x[3]]
-    nonprotected_candidates = [x for x in candidates if not x[3]]
+    nonprotected_candidates = []
 
     #print(protected_candidates)
     #print(nonprotected_candidates)
@@ -69,6 +69,55 @@ def run_steraming(candidates, nextProtected, results_limit):
             #print('swapping to ', 'protected' if nextProtected else 'nonprotected', 'queue')
 
     return matches, nextProtected
+
+
+def add_protected_group(dict_groups, index, tuple):
+    if dict_groups.get(index) == None:
+        dict_groups[index]=[tuple]
+    else:
+        dict_groups.get(index).append(tuple)
+
+def run_steraming_ranking_by_groups(candidates, nextGroup, results_limit):
+    matched_ids_left = set()
+    matched_ids_right = set()
+    matches = []
+
+    # nonprotected_candidates = []
+    grouped_candidates = {}
+    for x in candidates:
+        add_protected_group(grouped_candidates, int(x[3]), x) #index 0 is the non-protected group, others are protected
+
+    #groups_indexes works as a interface to determine the netx group to be benefit (selected)
+    #it works together nextGroup, which iterate over this list using the index (starting in 0)
+    groups_indexes = list(range(0, len(grouped_candidates)))
+
+    #print(protected_candidates)
+    #print(nonprotected_candidates)
+
+    while (groups_indexes) and (len(matches) < results_limit): #if groups_indexes is empty, means all groups are completely used
+        # cand = protected_candidates.pop(0) if ((nextGroup and protected_candidates) or not nonprotected_candidates) else nonprotected_candidates.pop(0)
+        cand = grouped_candidates.get(groups_indexes[nextGroup]).pop(0)
+
+        if len(grouped_candidates.get(groups_indexes[nextGroup])) == 0:
+            groups_indexes.remove(nextGroup)
+            nextGroup -= 1 #decrease one index after remove
+        #print(cand)
+
+        # unique mapping constraint check
+        if cand[0] in matched_ids_left or cand[1] in matched_ids_right:
+            #print('Skipping candidate: ', cand, 'for violating unique mapping constraint')
+            continue
+
+        # add pair to matches
+        matches.append(cand)
+        matched_ids_left.add(cand[0])
+        matched_ids_right.add(cand[1])
+
+        if groups_indexes:#(nextGroup and nonprotected_candidates) or (not nextGroup and protected_candidates):
+            nextGroup = 0 if nextGroup == (len(groups_indexes)-1) else nextGroup+1 # swap queues
+            #print('swapping to ', 'protected' if nextProtected else 'nonprotected', 'queue')
+
+    return matches, groups_indexes[nextGroup]
 
 
 if __name__ == '__main__':

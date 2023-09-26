@@ -269,11 +269,13 @@ def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results
 
         column_key = getKey(data)
 
-        initial_pairs = [(a.__getattribute__('left_' + column_key), a.__getattribute__('right_' + column_key), a.match_score, util.pair_is_protected(a, data, False))
+        initial_pairs = [(a.__getattribute__('left_' + column_key), a.__getattribute__('right_' + column_key), a.match_score, util.pair_is_protected_by_group(a, data, False))
                          for a in preds.itertuples(index=False)] #Ditto
 
 
-        clusters = fumc.run_steraming(initial_pairs, True, k_results)
+        # clusters = fumc.run_steraming(initial_pairs, True, k_results)
+        clusters = fumc.run_steraming_ranking_by_groups(initial_pairs, 1, k_results)
+
         print("\nclustering results:\n", clusters)
         #return clusters, preds, nextProtected
 

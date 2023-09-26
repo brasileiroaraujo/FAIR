@@ -96,9 +96,9 @@ def main():
     list_of_pairs = []
     nextProtected = True
     k_ranking = 20
-    task = 'DBLP-GoogleScholar'
+    task = 'Beer'
     lm="roberta"
-    k_batch = 5742
+    k_batch = 91
     incremental_clusters = []
 
     config, model, threshold, summarizer, dk_injector = setUpDitto(task="Structured/" + task, lm=lm, checkpoint_path="checkpoints/")

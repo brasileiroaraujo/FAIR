@@ -36,7 +36,18 @@ def pair_is_protected(tuple=None, dataset=None, return_condition=False, explanat
             else:
                 return eval(default_conditions[dataset]) if methods.protectedCond(dataset,0) is None else eval(methods.protectedCond(dataset,0))
 
+def pair_is_protected_by_group(tuple=None, dataset=None, return_condition=False, explanation=0):
+    if dataset == 'DBLP-ACM':
+        last_author_fname_l = str(tuple.left_authors).split(
+            ",")[-1].strip().split(" ")[0].replace('.', '')
+        last_author_fname_r = str(tuple.right_authors).split(
+            ",")[-1].strip().split(" ")[0].replace('.', '')
+        last_author_is_female = ('female' in d.get_gender(last_author_fname_l)) or \
+                                ('female' in d.get_gender(last_author_fname_r))
 
+        return 1 if last_author_is_female else 0 #0 always is the regular group, >=1 are the protected groups
+    else:
+        return eval(default_conditions_multiple_groups[dataset]) #if methods.protectedCond(dataset,0) is None else eval(methods.protectedCond(dataset,0))
 
 default_conditions = {'Amazon-Google': "('microsoft' in str(tuple.left_manufacturer)) or ('microsoft' in str(tuple.right_manufacturer))",
                       'Beer': "('Red' in str(tuple.left_Beer_Name)) or ('Red' in str(tuple.right_Beer_Name))",
@@ -44,9 +55,28 @@ default_conditions = {'Amazon-Google': "('microsoft' in str(tuple.left_manufactu
                       'DBLP-GoogleScholar': "('vldb j' in str(tuple.left_venue)) or ('vldb j' in str(tuple.right_venue))",
                       'Fodors-Zagats': "('asian' == str(tuple.left_entity_type)) or ('asian' == str(tuple.right_entity_type))",
                       'iTunes-Amazon': "('Dance' in str(tuple.left_Genre)) or ('Dance' in str(tuple.right_Genre))",
-                      'Walmart-Amazon': "('printers' in str(tuple.left_category)) or ('printers' in str(tuple.right_category)) "
-                                        "or ('laptop' in str(tuple.left_category)) or ('laptop' in str(tuple.right_category))"
-                                        "or ('monitors' in str(tuple.left_category)) or ('monitors' in str(tuple.right_category))"}
+                      'Walmart-Amazon': "('printers' in str(tuple.left_category)) or ('printers' in str(tuple.right_category)))"}
+
+default_conditions_multiple_groups = {'Amazon-Google': "1 if ('microsoft' in str(tuple.left_manufacturer)) or ('microsoft' in str(tuple.right_manufacturer))"
+                                                       "else 2 if (('sony' in str(tuple.left_manufacturer)) or ('sony' in str(tuple.right_manufacturer)))"
+                                                       "else 3 if (('apple' in str(tuple.left_manufacturer)) or ('apple' in str(tuple.right_manufacturer)))"
+                                                       "else 0",
+                       'Beer': "1 if ('Red' in str(tuple.left_Beer_Name)) or ('Red' in str(tuple.right_Beer_Name))"
+                               "else 2 if (('Amber' in str(tuple.left_Beer_Name)) or ('Amber' in str(tuple.right_Beer_Name)))"
+                               " else 0",
+                       'DBLP-ACM': "1 if ('female' in d.get_gender(last_author_fname_l)) or ('female' in d.get_gender(last_author_fname_r)) else 0",
+                       'DBLP-GoogleScholar': "1 if ('vldb j' in str(tuple.left_venue)) or ('vldb j' in str(tuple.right_venue))"
+                                             "else 2 if (('sigmod' in str(tuple.left_venue)) or ('sigmod' in str(tuple.right_venue)))"
+                                             "else 0",
+                       'Fodors-Zagats': "1 if ('asian' == str(tuple.left_entity_type)) or ('asian' == str(tuple.right_entity_type)) else 0",
+                       'iTunes-Amazon': "1 if ('Dance' in str(tuple.left_Genre)) or ('Dance' in str(tuple.right_Genre))"
+                                        "else 2 if (('Rap' in str(tuple.left_Genre)) or ('Rap' in str(tuple.right_Genre)))"
+                                        "else 3 if (('Rock' in str(tuple.left_Genre)) or ('Rock' in str(tuple.right_Genre)))"
+                                        "else 0",
+                       'Walmart-Amazon': "1 if (('printers' in tuple.left_category) or ('printers' in tuple.right_category))"
+                                         "else 2 if (('laptop' in tuple.left_category) or ('laptop' in tuple.right_category))"
+                                         "else 3 if (('monitors' in tuple.left_category) or ('monitors' in tuple.right_category))"
+                                         "else 0"}
 
 
 default_conditions_w_exp = {'Amazon-Google': "('microsoft' in str(tuple.ltable_manufacturer)) or ('microsoft' in str(tuple.rtable_manufacturer))",

@@ -6,7 +6,7 @@ max_ngram_size = 1
 num_keywords = 1
 custom_kw_extractor = yake.KeywordExtractor(lan=language, n=max_ngram_size, top=num_keywords)
 
-TEST_PATH = "D:/IntelliJ_Workspace/fairER/data/er_magellan/Structured/Walmart-Amazon/test.txt"
+TEST_PATH = "D:/IntelliJ_Workspace/fairER/data/er_magellan/Structured/iTunes-Amazon/test.txt"
 
 def extractValue(tuple, attribute_name):
     values_by_attribute = tuple.split(attribute_name + " VAL ")
@@ -26,7 +26,7 @@ with open(TEST_PATH, encoding="utf8") as file:
 left_values = set()
 right_values = set()
 for i in candidates:
-    left, right = extractValue(i, "category")
+    left, right = extractValue(i, "Genre")
 
     # print(getToken(left), getToken(right))
 
