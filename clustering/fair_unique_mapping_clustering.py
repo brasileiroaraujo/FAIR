@@ -101,7 +101,7 @@ def run_steraming_ranking_by_groups(candidates, nextGroup, results_limit):
         if len(grouped_candidates.get(groups_indexes[nextGroup])) == 0:
             print(groups_indexes)
             print("Removing ... " + str(nextGroup))
-            groups_indexes.remove(nextGroup)
+            groups_indexes.pop(nextGroup)
             nextGroup -= 1 #decrease one index after remove
         #print(cand)
 
