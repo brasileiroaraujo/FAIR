@@ -95,15 +95,11 @@ def run_steraming_ranking_by_groups(candidates, nextGroup, results_limit):
     #print(nonprotected_candidates)
 
     while (groups_indexes) and (len(matches) < results_limit): #if groups_indexes is empty, means all groups are completely used
-        # cand = protected_candidates.pop(0) if ((nextGroup and protected_candidates) or not nonprotected_candidates) else nonprotected_candidates.pop(0)
         cand = grouped_candidates.get(groups_indexes[nextGroup]).pop(0)
 
         if len(grouped_candidates.get(groups_indexes[nextGroup])) == 0:
-            print(groups_indexes)
-            print("Removing ... " + str(nextGroup))
             groups_indexes.pop(nextGroup)
             nextGroup -= 1 #decrease one index after remove
-        #print(cand)
 
         # unique mapping constraint check
         if cand[0] in matched_ids_left or cand[1] in matched_ids_right:
@@ -125,4 +121,3 @@ def run_steraming_ranking_by_groups(candidates, nextGroup, results_limit):
 if __name__ == '__main__':
     cand_list = [[-1,1,0.5,False],[-1,3,0.3,False],[-2,3,0.2,True],[-3,3,0.1,False],[-4,4,0.0,True]]
     clusters = run(cand_list)
-    #print(clusters)
