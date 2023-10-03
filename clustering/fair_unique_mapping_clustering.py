@@ -45,7 +45,7 @@ def run_steraming(candidates, nextProtected, results_limit):
     matches = []
 
     protected_candidates = [x for x in candidates if x[3]]
-    nonprotected_candidates = []
+    nonprotected_candidates = [x for x in candidates if not x[3]]
 
     #print(protected_candidates)
     #print(nonprotected_candidates)
