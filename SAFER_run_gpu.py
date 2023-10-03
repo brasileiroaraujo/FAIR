@@ -17,10 +17,15 @@ import matcher
 def sortBySimilarity(element):
     return float(element[2])
 
-def merge_clusters(clusters, incremental_clusters, k_ranking):
+def merge_clusters(clusters, incremental_clusters, k_ranking, ranking_mode):
     incremental_clusters.extend(clusters)
     incremental_clusters.sort(key=sortBySimilarity, reverse=True)
-    return run_steraming_ranking_by_groups(incremental_clusters, 1, k_ranking) #1 = the first protected group
+    if ranking_mode == 'm-fair':
+        print("Running m-fair")
+        return run_steraming_ranking_by_groups(incremental_clusters, 1, k_ranking) #1 = the first protected group
+    else: #default fair-er ranking
+        print("Running fair-er")
+        return fairness_ranking(incremental_clusters, True, k_ranking) #True = first the protected group
 
 def add_protected_group(dict_groups, index, tuple):
     if dict_groups.get(index) == None:
@@ -140,6 +145,7 @@ def main(args):
     lm= args[3] #"roberta"
     # k_batch = int(args[5]) #5742
     threshold = float(args[4])
+    ranking_mode = args[7]
     incremental_clusters = []
 
     pairs_to_compare = open_csv(BASE_PATH + task + '/test.txt')
@@ -170,10 +176,10 @@ def main(args):
 
         #call ditto to match
         #PERFORM DITTO
-        clusters, preds, av_time, nextProtected = match_rank_streaming(task, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking)
+        clusters, preds, av_time, nextProtected = match_rank_streaming(task, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking, ranking_mode)
 
         #RANKING
-        incremental_clusters = merge_clusters(clusters, incremental_clusters, k_ranking)
+        incremental_clusters = merge_clusters(clusters, incremental_clusters, k_ranking, ranking_mode)
         list_of_pairs = []
         # current_dataframe_source.drop(current_dataframe_source.index, inplace=True)
 

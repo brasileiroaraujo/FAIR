@@ -241,7 +241,7 @@ def cartesian_product(source, target):
     return [[s,t] for s in format_source for t in format_target]
 
 
-def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results, config, model, threshold, summarizer, dk_injector, lm):
+def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results, config, model, threshold, summarizer, dk_injector, lm, ranking_mode):
     ###########
     # Matching with Ditto
     ###########
@@ -272,9 +272,12 @@ def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results
         initial_pairs = [(a.__getattribute__('left_' + column_key), a.__getattribute__('right_' + column_key), a.match_score, util.pair_is_protected_by_group(a, data, False))
                          for a in preds.itertuples(index=False)] #Ditto
 
-
-        # clusters = fumc.run_steraming(initial_pairs, True, k_results)
-        clusters = fumc.run_steraming_ranking_by_groups(initial_pairs, 1, k_results)
+        if ranking_mode == 'm-fair':
+            print("Running m-fair")
+            clusters = fumc.run_steraming_ranking_by_groups(initial_pairs, 1, k_results) #1 = the first protected group
+        else: #default fair-er ranking
+            print("Running fair-er")
+            clusters = fumc.run_steraming(initial_pairs, True, k_results) #True = first the protected group
 
         print("\nclustering results:\n", clusters)
         #return clusters, preds, nextProtected

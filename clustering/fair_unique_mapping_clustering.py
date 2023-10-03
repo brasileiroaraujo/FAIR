@@ -68,7 +68,7 @@ def run_steraming(candidates, nextProtected, results_limit):
             nextProtected = not nextProtected  # swap queues
             #print('swapping to ', 'protected' if nextProtected else 'nonprotected', 'queue')
 
-    return matches, nextProtected
+    return matches
 
 
 def add_protected_group(dict_groups, index, tuple):
