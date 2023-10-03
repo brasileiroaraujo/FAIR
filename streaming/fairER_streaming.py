@@ -269,7 +269,7 @@ def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results
 
         column_key = getKey(data)
 
-        initial_pairs = [(a.__getattribute__('left_' + column_key), a.__getattribute__('right_' + column_key), a.match_score, util.pair_is_protected_by_group(a, data, False))
+        initial_pairs = [(a.__getattribute__('left_' + column_key), a.__getattribute__('right_' + column_key), a.match_score, (util.pair_is_protected_by_group(a, data, False) if ranking_mode == 'm-fair' else util.pair_is_protected(a, data, False)))
                          for a in preds.itertuples(index=False)] #Ditto
 
         if ranking_mode == 'm-fair':
