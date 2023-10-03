@@ -45,12 +45,12 @@ def run_steraming_ranking_by_groups(candidates, nextGroup, results_limit):
 
     #groups_indexes works as a interface to determine the netx group to be benefit (selected)
     #it works together nextGroup, which iterate over this list using the index (starting in 0)
-    groups_indexes = list(range(0, len(grouped_candidates)))
+    groups_indexes = list(range(0, max(grouped_candidates.keys())+1))
 
     while (groups_indexes) and (len(matches) < results_limit): #if groups_indexes is empty, means all groups are completely used
         if grouped_candidates.get(groups_indexes[nextGroup]) == None or len(grouped_candidates.get(groups_indexes[nextGroup])) == 0:
             groups_indexes.pop(nextGroup)
-            nextGroup = 0 if nextGroup >= (len(groups_indexes)-1) else nextGroup+1
+            nextGroup = 0 if nextGroup >= (len(groups_indexes)-1) else nextGroup
             continue
 
         cand = grouped_candidates.get(groups_indexes[nextGroup]).pop(0)
