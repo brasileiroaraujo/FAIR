@@ -115,7 +115,7 @@ def run_steraming_ranking_by_groups(candidates, nextGroup, results_limit):
             nextGroup = 0 if nextGroup == (len(groups_indexes)-1) else nextGroup+1 # swap queues
             #print('swapping to ', 'protected' if nextProtected else 'nonprotected', 'queue')
 
-    return matches, groups_indexes[nextGroup]
+    return matches
 
 
 if __name__ == '__main__':

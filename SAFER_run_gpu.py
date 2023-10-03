@@ -18,9 +18,55 @@ def sortBySimilarity(element):
     return float(element[2])
 
 def merge_clusters(clusters, incremental_clusters, k_ranking):
-    incremental_clusters.extend(clusters[0])
+    incremental_clusters.extend(clusters)
     incremental_clusters.sort(key=sortBySimilarity, reverse=True)
-    return fairness_ranking(incremental_clusters, True, k_ranking)
+    return run_steraming_ranking_by_groups(incremental_clusters, 1, k_ranking) #1 = the first protected group
+
+def add_protected_group(dict_groups, index, tuple):
+    if dict_groups.get(index) == None:
+        dict_groups[index]=[tuple]
+    else:
+        dict_groups.get(index).append(tuple)
+
+def run_steraming_ranking_by_groups(candidates, nextGroup, results_limit):
+    matched_ids_left = set()
+    matched_ids_right = set()
+    matches = []
+
+    # nonprotected_candidates = []
+    grouped_candidates = {}
+    for x in candidates:
+        add_protected_group(grouped_candidates, int(x[3]), x) #index 0 is the non-protected group, others are protected
+
+    #groups_indexes works as a interface to determine the netx group to be benefit (selected)
+    #it works together nextGroup, which iterate over this list using the index (starting in 0)
+    groups_indexes = list(range(0, len(grouped_candidates)))
+
+    #print(protected_candidates)
+    #print(nonprotected_candidates)
+
+    while (groups_indexes) and (len(matches) < results_limit): #if groups_indexes is empty, means all groups are completely used
+        cand = grouped_candidates.get(groups_indexes[nextGroup]).pop(0)
+
+        if len(grouped_candidates.get(groups_indexes[nextGroup])) == 0:
+            groups_indexes.pop(nextGroup)
+            nextGroup -= 1 #decrease one index after remove
+
+        # unique mapping constraint check
+        if cand[0] in matched_ids_left or cand[1] in matched_ids_right:
+            #print('Skipping candidate: ', cand, 'for violating unique mapping constraint')
+            continue
+
+        # add pair to matches
+        matches.append(cand)
+        matched_ids_left.add(cand[0])
+        matched_ids_right.add(cand[1])
+
+        if groups_indexes:#(nextGroup and nonprotected_candidates) or (not nextGroup and protected_candidates):
+            nextGroup = 0 if nextGroup == (len(groups_indexes)-1) else nextGroup+1 # swap queues
+            #print('swapping to ', 'protected' if nextProtected else 'nonprotected', 'queue')
+
+    return matches
 
 def fairness_ranking(candidates, nextProtected, results_limit):
     matched_ids_left = set()
@@ -132,7 +178,7 @@ def main(args):
         # current_dataframe_source.drop(current_dataframe_source.index, inplace=True)
 
         print('clusters:')
-        print(clusters)
+        print(incremental_clusters)
 
         time.sleep(int(args[6]))
 
