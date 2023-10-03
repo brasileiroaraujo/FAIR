@@ -47,15 +47,13 @@ def run_steraming_ranking_by_groups(candidates, nextGroup, results_limit):
     #it works together nextGroup, which iterate over this list using the index (starting in 0)
     groups_indexes = list(range(0, len(grouped_candidates)))
 
-    #print(protected_candidates)
-    #print(nonprotected_candidates)
-
     while (groups_indexes) and (len(matches) < results_limit): #if groups_indexes is empty, means all groups are completely used
-        cand = grouped_candidates.get(groups_indexes[nextGroup]).pop(0)
-
-        if len(grouped_candidates.get(groups_indexes[nextGroup])) == 0:
+        if grouped_candidates.get(groups_indexes[nextGroup]) == None or len(grouped_candidates.get(groups_indexes[nextGroup])) == 0:
             groups_indexes.pop(nextGroup)
-            nextGroup -= 1 #decrease one index after remove
+            nextGroup = 0 if nextGroup >= (len(groups_indexes)-1) else nextGroup+1
+            continue
+
+        cand = grouped_candidates.get(groups_indexes[nextGroup]).pop(0)
 
         # unique mapping constraint check
         if cand[0] in matched_ids_left or cand[1] in matched_ids_right:
