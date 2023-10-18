@@ -50,7 +50,7 @@ def run_steraming_ranking_by_groups(candidates, nextGroup, results_limit):
     while (groups_indexes) and (len(matches) < results_limit): #if groups_indexes is empty, means all groups are completely used
         if grouped_candidates.get(groups_indexes[nextGroup]) == None or len(grouped_candidates.get(groups_indexes[nextGroup])) == 0:
             groups_indexes.pop(nextGroup)
-            nextGroup = 0 if nextGroup >= (len(groups_indexes)-1) else nextGroup
+            nextGroup = 0 if nextGroup >= len(groups_indexes)-1 else nextGroup
             continue
 
         cand = grouped_candidates.get(groups_indexes[nextGroup]).pop(0)
