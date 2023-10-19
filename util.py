@@ -75,7 +75,7 @@ default_conditions_multiple_groups = {'Amazon-Google': "1 if ('microsoft' in str
                                         "else 0",
                        'Walmart-Amazon': "1 if (('printers' in tuple.left_category) or ('printers' in tuple.right_category))"
                                          "else 2 if (('laptop' in tuple.left_category) or ('laptop' in tuple.right_category))"
-                                         "else 3 if (('monitors' in tuple.left_category) or ('monitors' in tuple.right_category))"
+                                         "else 3 if (('camera' in tuple.left_category) or ('camera' in tuple.right_category))"
                                          "else 0"}
 
 
