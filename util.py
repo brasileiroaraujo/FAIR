@@ -67,7 +67,7 @@ default_conditions_multiple_groups = {'Amazon-Google': "1 if ('microsoft' in str
                        'DBLP-ACM': "1 if ('female' in d.get_gender(last_author_fname_l)) or ('female' in d.get_gender(last_author_fname_r)) else 0",
                        'DBLP-GoogleScholar': "1 if ('vldb j' in str(tuple.left_venue)) or ('vldb j' in str(tuple.right_venue))"
                                              "else 2 if (('sigmod' in str(tuple.left_venue)) or ('sigmod' in str(tuple.right_venue)))"
-                                             "else 3 if (('tods' in str(tuple.left_venue)) or ('apple' in str(tuple.right_venue)))"
+                                             "else 3 if (('tods' in str(tuple.left_venue)) or ('tods' in str(tuple.right_venue)))"
                                              "else 0",
                        'Fodors-Zagats': "1 if ('asian' == str(tuple.left_entity_type)) or ('asian' == str(tuple.right_entity_type)) else 0",
                        'iTunes-Amazon': "1 if ('Hip-Hop' in str(tuple.left_Genre)) or ('Hip-Hop' in str(tuple.right_Genre))"

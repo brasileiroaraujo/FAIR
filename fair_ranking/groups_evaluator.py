@@ -1,12 +1,14 @@
 #Class to evaluate the diversity in protected attributes
 import yake
 
+from evaluation import decompose_col_val
+
 language = "en"
 max_ngram_size = 1
 num_keywords = 1
 custom_kw_extractor = yake.KeywordExtractor(lan=language, n=max_ngram_size, top=num_keywords)
 
-TEST_PATH = "D:/IntelliJ_Workspace/fairER/data/er_magellan/Structured/iTunes-Amazon/test.txt"
+TEST_PATH = "D:/IntelliJ_Workspace/fairER/data/er_magellan/Structured/DBLP-GoogleScholar/test.txt"
 
 def extractValue(tuple, attribute_name):
     values_by_attribute = tuple.split(attribute_name + " VAL ")
@@ -23,17 +25,18 @@ def getToken(text):
 with open(TEST_PATH, encoding="utf8") as file:
     candidates = [line.rstrip() for line in file]
 
-left_values = set()
-right_values = set()
+left_values = []
+right_values = []
+pairs = []
 for i in candidates:
-    left, right = extractValue(i, "Genre")
+    if i[len(i) - 1] == '1':
+        left, right = extractValue(i, "venue")
+        if len(getToken(left)) > 0: left_values.append(getToken(left)[0])
+        if len(getToken(right)) > 0: right_values.append(getToken(right)[0])
 
-    # print(getToken(left), getToken(right))
+        df = decompose_col_val.decompose_srt_to_df(i)
+        pairs.append(df.left_venue[0] + ' - ' + df.right_venue[0])
 
-    if len(getToken(left)) > 0: left_values.add(getToken(left)[0])
-    if len(getToken(right)) > 0: right_values.add(getToken(right)[0])
-    # left_values.add(getToken(left))
-    # right_values.add(getToken(right))
 
 #Summary
 print("left size: " + str(len(left_values)))
@@ -44,6 +47,12 @@ for i in left_values:
     if i in right_values:
         print(i)
 
-# print("---- Right ----")
-# for i in right_values:
-#     print(i)
+print("---- Right ----")
+for i in right_values:
+    print(i)
+
+print("---- Pairs ----")
+print(len(pairs))
+for i in pairs:
+    if not ("vldb" in i or "sigmod" in i):
+        print(i)
