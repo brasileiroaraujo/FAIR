@@ -69,8 +69,9 @@ default_conditions_multiple_groups = {'Amazon-Google': "1 if ('microsoft' in str
                                              "else 2 if (('sigmod' in str(tuple.left_venue)) or ('sigmod' in str(tuple.right_venue)))"
                                              "else 0",
                        'Fodors-Zagats': "1 if ('asian' == str(tuple.left_entity_type)) or ('asian' == str(tuple.right_entity_type)) else 0",
-                       'iTunes-Amazon': "1 if ('Dance' in str(tuple.left_Genre)) or ('Dance' in str(tuple.right_Genre))"
-                                        "else 2 if (('Honky' in str(tuple.left_Genre)) or ('Honky' in str(tuple.right_Genre)))"
+                       'iTunes-Amazon': "1 if ('Hip-Hop' in str(tuple.left_Genre)) or ('Hip-Hop' in str(tuple.right_Genre))"
+                                        "else 2 if (('Dance' in str(tuple.left_Genre)) or ('Dance' in str(tuple.right_Genre)))"
+                                        "else 3 if (('Rock' in str(tuple.left_Genre)) or ('Rock' in str(tuple.right_Genre)))"
                                         "else 0",
                        'Walmart-Amazon': "1 if (('printers' in tuple.left_category) or ('printers' in tuple.right_category))"
                                          "else 2 if (('laptop' in tuple.left_category) or ('laptop' in tuple.right_category))"
