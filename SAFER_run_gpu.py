@@ -148,6 +148,8 @@ def main(args):
     ranking_mode = args[7]
     incremental_clusters = []
 
+    results = {"top-5":[], "top-10":[],	"top-15":[], "top-20":[], "time_to_match":[], "time_to_rank":[], "total_time":[], "PPVP":[], "Bias":[]}
+
     with open(BASE_PATH + task + '/test.txt', encoding="utf8") as file:
         labed_file = [line.rstrip() for line in file]
 
@@ -179,20 +181,25 @@ def main(args):
 
         #call ditto to match
         #PERFORM DITTO
-        clusters, preds, av_time, nextProtected = match_rank_streaming(task, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking, ranking_mode)
+        clusters, preds, av_time, nextProtected, time_to_match, time_to_rank = match_rank_streaming(task, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking, ranking_mode)
 
         #RANKING
         incremental_clusters = merge_clusters(clusters, incremental_clusters, k_ranking, ranking_mode)
         list_of_pairs = []
         # current_dataframe_source.drop(current_dataframe_source.index, inplace=True)
 
+        results["time_to_match"].append(time_to_match)
+        results["time_to_rank"].append(time_to_rank)
+        results["total_time"].append(time_to_match + time_to_rank)
+
         print('clusters:')
         print(incremental_clusters)
 
         #evaluate effectivenss and fairness
-        perform_evaluation(incremental_clusters, labed_file)
+        perform_evaluation(incremental_clusters, labed_file, results)
 
         time.sleep(int(args[6]))
+    print(results)
     file.close()
 
 if __name__ == '__main__':

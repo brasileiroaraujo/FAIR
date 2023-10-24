@@ -253,7 +253,8 @@ def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results
     #sending the pairs to be matched
     start_time = time.time()
     matcher.run_matcher_streaming2(input_dataframe=list_of_pairs, output_path=path_matches, config=config, model=model, threshold=threshold, summarizer=summarizer, dk_injector=dk_injector, lm=lm) #, lm="roberta", checkpoint_path="checkpoints/")
-    print('Time to match: ' + str(time.time() - start_time))
+    time_to_match = time.time() - start_time
+    print('Time to match: ' + str(time_to_match))
 
 
     ###########
@@ -285,9 +286,10 @@ def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results
     else:
         print("\nNo matches detected.\n")
 
-    print('Time to rank: ' + str(time.time() - start_time))
+    time_to_rank = time.time() - start_time
+    print('Time to rank: ' + str(time_to_rank))
 
-    return clusters, preds, nextProtected
+    return clusters, preds, nextProtected, time_to_match, time_to_rank
 
 
 

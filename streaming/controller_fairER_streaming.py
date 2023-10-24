@@ -67,11 +67,11 @@ def match_rank_streaming(data, list_of_pairs, nextProtected, config, model, thre
     av_time = 0
     # for _ in range(10):
     start_time = time.time()
-    clusters, preds, nextProtected = run_matching_ranking_streaming(data=data, list_of_pairs=list_of_pairs, nextProtected=nextProtected, k_results=k_ranking, config=config, model=model, threshold=threshold, summarizer=summarizer, dk_injector=dk_injector, lm=lm, ranking_mode=ranking_mode)
+    clusters, preds, nextProtected, time_to_match, time_to_rank = run_matching_ranking_streaming(data=data, list_of_pairs=list_of_pairs, nextProtected=nextProtected, k_results=k_ranking, config=config, model=model, threshold=threshold, summarizer=summarizer, dk_injector=dk_injector, lm=lm, ranking_mode=ranking_mode)
     ex_time = time.time() - start_time
     av_time += ex_time
 
-    return clusters, preds, av_time, nextProtected
+    return clusters, preds, av_time, nextProtected, time_to_match, time_to_rank
 
 
 if __name__ == '__main__':

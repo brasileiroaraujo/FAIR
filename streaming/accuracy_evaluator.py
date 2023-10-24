@@ -34,17 +34,21 @@ def compute_accuracy_precision(clusters, labed_file):
     print("Precision: " + str(precision))
     accuracies.append([precision])
 
-    return accuracies
+    return accuracies, precision
 
-def perform_evaluation(clusters, labed_file):
+def perform_evaluation(clusters, labed_file, results):
     cell_reference = 'D70'
 
     print('========FAIRNESS========')
 
-    print('R-bias: ', fairness_metrics.compute_bias(clusters))
+    R = fairness_metrics.compute_bias(clusters)
+    results["Bias"].append(R)
+    print('R-bias: ', )
     print('========================')
     # print('TPRP: ', fairness_metrics.compute_TPRP(clusters_20, goldstandard, DATASET, 'fair'))
-    print('PPVP: ', fairness_metrics.compute_PPVP(clusters, labed_file))
+    ppvp = fairness_metrics.compute_PPVP(clusters, labed_file)
+    results["PPVP"].append(ppvp)
+    print('PPVP: ', )
     print('========================')
 
 
@@ -56,7 +60,9 @@ def perform_evaluation(clusters, labed_file):
 
         print('RESULTS TOP-' + str(len(clusters_sliced)))
 
-        accuracies = compute_accuracy_precision(clusters_sliced, labed_file)
+        accuracies,precision = compute_accuracy_precision(clusters_sliced, labed_file)
+
+        results["top-" + str(top_k)].append(precision)
 
         print("====================")
 
