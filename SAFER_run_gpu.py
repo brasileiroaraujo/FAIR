@@ -2,6 +2,8 @@ import sys
 
 import pandas as pd
 import time
+
+from streaming.accuracy_evaluator import perform_evaluation
 from streaming.controller_fairER_streaming import match_rank_streaming
 import matcher
 
@@ -146,6 +148,9 @@ def main(args):
     ranking_mode = args[7]
     incremental_clusters = []
 
+    with open(BASE_PATH + task + '/test.txt', encoding="utf8") as file:
+        labed_file = [line.rstrip() for line in file]
+
     pairs_to_compare = open_csv(BASE_PATH + task + '/test.txt')
 
     config, model, threshold, summarizer, dk_injector = setUpDitto(task="Structured/" + task, lm=lm, checkpoint_path="checkpoints/", threshold = threshold)
@@ -183,6 +188,9 @@ def main(args):
 
         print('clusters:')
         print(incremental_clusters)
+
+        #evaluate effectivenss and fairness
+        perform_evaluation(incremental_clusters, labed_file)
 
         time.sleep(int(args[6]))
 
