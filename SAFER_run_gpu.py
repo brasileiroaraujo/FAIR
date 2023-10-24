@@ -193,6 +193,7 @@ def main(args):
         perform_evaluation(incremental_clusters, labed_file)
 
         time.sleep(int(args[6]))
+    file.close()
 
 if __name__ == '__main__':
     args = sys.argv[1:]

@@ -1,5 +1,4 @@
 import pandas as pd
-import pygsheets
 import evaluation.fairness_metrics as fairness_metrics
 import numpy as np
 
@@ -51,11 +50,6 @@ def perform_evaluation(clusters, labed_file):
 
     top_ks = [5, 10, 15, 20]
 
-    # client = pygsheets.authorize(client_secret='C:/Users/admin/Desktop/STREAMING+FAIRNESS RESULTS/client_secret_914606524472-d3pdv2h83599j5gjrbv1u9lhgn2fs428.apps.googleusercontent.com.json')
-    # # Open the spreadsheet and the first sheet.
-    # sh = client.open('FairnessResults')
-    # wks = sh.sheet1
-
 
     for top_k in top_ks:
         clusters_sliced = clusters[:top_k]
@@ -66,9 +60,7 @@ def perform_evaluation(clusters, labed_file):
 
         print("====================")
 
-    file.close()
     # print(accuracies)
-    # wks.update_values(crange=cell_reference, values=accuracies, majordim='COLUMNS')
 
 
 # goldstandard = pd.read_csv(TEST_PATH, header=None, sep='\n')
@@ -103,3 +95,4 @@ def perform_evaluation(clusters, labed_file):
 # with open(TEST_PATH, encoding="utf8") as file:
 #     labed_file = [line.rstrip() for line in file]
 # perform_evaluation(clusters_20)
+# file.close()
