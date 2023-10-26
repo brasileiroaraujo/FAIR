@@ -37,18 +37,16 @@ def compute_accuracy_precision(clusters, labed_file):
     return accuracies, precision
 
 def perform_evaluation(clusters, labed_file, results):
-    cell_reference = 'D70'
-
     print('========FAIRNESS========')
 
     R = fairness_metrics.compute_bias(clusters)
     results["Bias"].append(R)
-    print('R-bias: ', )
+    print('R-bias: ', R)
     print('========================')
     # print('TPRP: ', fairness_metrics.compute_TPRP(clusters_20, goldstandard, DATASET, 'fair'))
     ppvp = fairness_metrics.compute_PPVP(clusters, labed_file)
     results["PPVP"].append(ppvp)
-    print('PPVP: ', )
+    print('PPVP: ', ppvp)
     print('========================')
 
 
