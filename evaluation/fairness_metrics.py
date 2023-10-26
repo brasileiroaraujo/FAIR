@@ -155,7 +155,7 @@ def compute_PPVP(clusters, goldstandard):
 
     values = list(tp_fp_per_group.values())
 
-    #compute the max difference between the groups
-    ppvp = max(values) - min(values)
+    #compute the max difference between the groups and the ideal value (i.e., 1)
+    ppvp = 1.0 - min(values)
 
     return ppvp
