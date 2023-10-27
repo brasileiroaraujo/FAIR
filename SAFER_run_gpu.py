@@ -148,7 +148,7 @@ def main(args):
     ranking_mode = args[7]
     incremental_clusters = []
 
-    results = {"top-5":[], "top-10":[],	"top-15":[], "top-20":[], "time_to_match":[], "time_to_rank":[], "total_time":[], "PPVP":[], "Bias":[]}
+    results = {"top-5":[], "top-10":[],	"top-15":[], "top-20":[], "time_to_match":[], "time_to_rank":[], "total_time":[], "PPVP":[], "TPRP":[], "Bias":[]}
 
     with open(BASE_PATH + task + '/test.txt', encoding="utf8") as file:
         labed_file = [line.rstrip() for line in file]
