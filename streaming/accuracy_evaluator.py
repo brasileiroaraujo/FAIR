@@ -2,8 +2,8 @@ import pandas as pd
 import evaluation.fairness_metrics as fairness_metrics
 import numpy as np
 
-DATASET = 'DBLP-GoogleScholar'
-TEST_PATH = "D:/IntelliJ_Workspace/fairER/data/er_magellan/Structured/" + DATASET + "/test.txt"
+# DATASET = 'DBLP-GoogleScholar'
+# TEST_PATH = "D:/IntelliJ_Workspace/fairER/data/er_magellan/Structured/" + DATASET + "/test.txt"
 
 def compute_accuracy_precision(clusters, labed_file):
     correct = 0
@@ -36,7 +36,7 @@ def compute_accuracy_precision(clusters, labed_file):
 
     return accuracies, precision
 
-def perform_evaluation(clusters, labed_file, results):
+def perform_evaluation(task, clusters, labed_file, results):
     print('========FAIRNESS========')
 
     R = fairness_metrics.compute_bias(clusters)
@@ -48,7 +48,7 @@ def perform_evaluation(clusters, labed_file, results):
     results["PPVP"].append(ppvp)
     print('PPVP: ', ppvp)
     print('========================')
-    tprp = fairness_metrics.compute_TPRP_top_k(clusters, labed_file, DATASET, 'm-fair')
+    tprp = fairness_metrics.compute_TPRP_top_k(clusters, labed_file, task, 'm-fair')
     results["TPRP"].append(tprp)
     print('TPRP: ', tprp)
     print('========================')

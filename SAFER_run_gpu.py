@@ -197,7 +197,7 @@ def main(args):
         print(incremental_clusters)
 
         #evaluate effectivenss and fairness
-        perform_evaluation(incremental_clusters, reference, results)
+        perform_evaluation(task, incremental_clusters, reference, results)
 
         time.sleep(int(args[6]))
     print(results)
