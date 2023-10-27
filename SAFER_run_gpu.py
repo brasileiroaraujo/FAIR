@@ -168,7 +168,7 @@ def main(args):
 
     while ((not pairs_to_compare.empty) and (init < pair_size)):#for i in range(0,len(preds.index)):
         lines = pairs_to_compare.loc[init:min(n_batches, pair_size)]
-        reference = labed_file[init:min(n_batches, pair_size)]
+        reference = labed_file[0:min(n_batches, pair_size)]
 
         for row in lines.to_numpy():
             triple = row[0].split("\t")
