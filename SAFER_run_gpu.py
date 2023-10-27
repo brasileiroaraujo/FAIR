@@ -168,6 +168,7 @@ def main(args):
 
     while ((not pairs_to_compare.empty) and (init < pair_size)):#for i in range(0,len(preds.index)):
         lines = pairs_to_compare.loc[init:min(n_batches, pair_size)]
+        reference = labed_file[init:min(n_batches, pair_size)]
 
         for row in lines.to_numpy():
             triple = row[0].split("\t")
@@ -196,7 +197,7 @@ def main(args):
         print(incremental_clusters)
 
         #evaluate effectivenss and fairness
-        perform_evaluation(incremental_clusters, lines, results)
+        perform_evaluation(incremental_clusters, reference, results)
 
         time.sleep(int(args[6]))
     print(results)
