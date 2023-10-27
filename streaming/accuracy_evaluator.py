@@ -49,7 +49,7 @@ def perform_evaluation(clusters, labed_file, results):
     print('PPVP: ', ppvp)
     print('========================')
     tprp = fairness_metrics.compute_TPRP_top_k(clusters, labed_file, DATASET, 'm-fair')
-    results["TPRP"].append(ppvp)
+    results["TPRP"].append(tprp)
     print('TPRP: ', tprp)
     print('========================')
 
