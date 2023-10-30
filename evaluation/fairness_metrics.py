@@ -57,6 +57,8 @@ def compute_tp_fn_by_group_top_k(clusters, labed_file, dataset, ranking_mode):
         if key in range(1,discrepancy_between_groups+1): #this groups will benefit by the discrepancy, with one more pair
             fn = min(max_recall_top_k+1, max_recall_per_group[key]) - tp_fn[key][0]
         else:
+            print(max_recall_per_group)
+            print(tp_fn)
             fn = min(max_recall_top_k, max_recall_per_group[key]) - tp_fn[key][0]
 
         if fn < 0: #normalize to avoid negative values for unbalanced groups
