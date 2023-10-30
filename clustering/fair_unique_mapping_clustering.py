@@ -95,6 +95,10 @@ def run_steraming_ranking_by_groups(candidates, nextGroup, results_limit):
     #print(nonprotected_candidates)
 
     while (groups_indexes) and (len(matches) < results_limit): #if groups_indexes is empty, means all groups are completely used
+        if nextGroup > len(groups_indexes)-1:
+            nextGroup = 0
+            continue
+
         if grouped_candidates.get(groups_indexes[nextGroup]) == None or len(grouped_candidates.get(groups_indexes[nextGroup])) == 0:
             groups_indexes.pop(nextGroup)
             nextGroup = 0 if nextGroup >= len(groups_indexes) else nextGroup
