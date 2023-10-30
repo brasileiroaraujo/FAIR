@@ -36,7 +36,7 @@ def compute_accuracy_precision(clusters, labed_file):
 
     return accuracies, precision
 
-def perform_evaluation(task, clusters, labed_file, results):
+def perform_evaluation(task, clusters, labed_file, results, ranking_mode):
     print('========FAIRNESS========')
 
     R = fairness_metrics.compute_bias(clusters)
@@ -48,7 +48,7 @@ def perform_evaluation(task, clusters, labed_file, results):
     results["PPVP"].append(ppvp)
     print('PPVP: ', ppvp)
     print('========================')
-    tprp = fairness_metrics.compute_TPRP_top_k(clusters, labed_file, task, 'm-fair')
+    tprp = fairness_metrics.compute_TPRP_top_k(clusters, labed_file, task, ranking_mode)
     results["TPRP"].append(tprp)
     print('TPRP: ', tprp)
     print('========================')
