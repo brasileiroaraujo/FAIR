@@ -64,7 +64,7 @@ default_conditions_multiple_groups = {'Amazon-Google': "1 if ('microsoft' in str
                        'Beer': "1 if ('Red' in str(tuple.left_Beer_Name)) or ('Red' in str(tuple.right_Beer_Name))"
                                "else 2 if (('Amber' in str(tuple.left_Beer_Name)) or ('Amber' in str(tuple.right_Beer_Name)))"
                                "else 0",
-                       'DBLP-ACM': "1 if ('female' in d.get_gender(last_author_fname_l)) or ('female' in d.get_gender(last_author_fname_r)) else 0",
+                       'DBLP-ACM': "1 if ('female' in str(d.get_gender(last_author_fname_l))) or ('female' in str(d.get_gender(last_author_fname_r))) else 0",
                        'DBLP-GoogleScholar': "1 if ('vldb j' in str(tuple.left_venue)) or ('vldb j' in str(tuple.right_venue))"
                                              "else 2 if (('sigmod' in str(tuple.left_venue)) or ('sigmod' in str(tuple.right_venue)))"
                                              "else 3 if (('tods' in str(tuple.left_venue)) or ('tods' in str(tuple.right_venue)))"
@@ -74,9 +74,9 @@ default_conditions_multiple_groups = {'Amazon-Google': "1 if ('microsoft' in str
                                         "else 2 if (('Dance' in str(tuple.left_Genre)) or ('Dance' in str(tuple.right_Genre)))"
                                         "else 3 if (('Rock' in str(tuple.left_Genre)) or ('Rock' in str(tuple.right_Genre)))"
                                         "else 0",
-                       'Walmart-Amazon': "1 if (('printers' in tuple.left_category) or ('printers' in tuple.right_category))"
-                                         "else 2 if (('laptop' in tuple.left_category) or ('laptop' in tuple.right_category))"
-                                         "else 3 if (('cameras' in tuple.left_category) or ('cameras' in tuple.right_category))"
+                       'Walmart-Amazon': "1 if (('printers' in str(tuple.left_category)) or ('printers' in str(tuple.right_category)))"
+                                         "else 2 if (('laptop' in str(tuple.left_category)) or ('laptop' in str(tuple.right_category)))"
+                                         "else 3 if (('cameras' in str(tuple.left_category)) or ('cameras' in str(tuple.right_category)))"
                                          "else 0"}
 
 
