@@ -45,6 +45,9 @@ def compute_tp_fn_by_group_top_k(clusters, labed_file, dataset, ranking_mode):
     for pair in goldstandard:
         pair_df = decompose_srt_to_df(pair)
         print(pair_df.left_category, pair_df.right_category)
+        print(dataset)
+        print("res: ", ('printers' in pair_df.left_category) or ('printers' in pair_df.right_category))
+        print(util.pair_is_protected_by_group(tuple=pair_df, dataset=dataset, return_condition=False))
         group = util.pair_is_protected_by_group(pair_df, dataset, False) if ranking_mode == 'm-fair' \
             else util.pair_is_protected(pair_df, dataset, False)
         if (group in max_recall_per_group.keys()):
