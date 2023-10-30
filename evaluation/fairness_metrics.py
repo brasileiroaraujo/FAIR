@@ -44,6 +44,7 @@ def compute_tp_fn_by_group_top_k(clusters, labed_file, dataset, ranking_mode):
     #compute the max recall in each group
     for pair in goldstandard:
         pair_df = decompose_srt_to_df(pair)
+        print(pair_df)
         group = util.pair_is_protected_by_group(pair_df, dataset, False) if ranking_mode == 'm-fair' \
             else util.pair_is_protected(pair_df, dataset, False)
         if (group in max_recall_per_group.keys()):
