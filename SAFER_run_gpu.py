@@ -185,7 +185,11 @@ def main(args):
         clusters, preds, av_time, nextProtected, time_to_match, time_to_rank = match_rank_streaming(task, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking, ranking_mode)
 
         #RANKING
-        incremental_clusters = merge_clusters(clusters, incremental_clusters, k_ranking, ranking_mode)
+        if ranking_mode == 'none':
+            print("Skipping Ranking Step!")
+            incremental_clusters = clusters
+        else:
+            incremental_clusters = merge_clusters(clusters, incremental_clusters, k_ranking, ranking_mode)
         list_of_pairs = []
         # current_dataframe_source.drop(current_dataframe_source.index, inplace=True)
 
