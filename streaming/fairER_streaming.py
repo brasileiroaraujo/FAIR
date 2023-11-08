@@ -277,7 +277,7 @@ def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results
 
         if ranking_mode == 'none':
             print("Skipping Ranking Step!")
-            clusters = initial_pairs
+            clusters = initial_pairs[0:k_results-1]
         elif ranking_mode == 'm-fair':
             print("Running m-fair")
             clusters = fumc.run_steraming_ranking_by_groups(initial_pairs, 1, k_results) #1 = the first protected group
