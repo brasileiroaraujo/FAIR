@@ -190,7 +190,7 @@ def main(args):
             #merging the results
             incremental_clusters.extend(clusters)
             incremental_clusters.sort(key=sortBySimilarity, reverse=True)
-            incremental_clusters = incremental_clusters[0:k_ranking-1]
+            incremental_clusters = incremental_clusters[0:k_ranking]
         else:
             incremental_clusters = merge_clusters(clusters, incremental_clusters, k_ranking, ranking_mode)
         list_of_pairs = []
