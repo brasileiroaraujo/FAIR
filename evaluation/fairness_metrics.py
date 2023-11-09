@@ -12,6 +12,7 @@ def compute_bias(clusters, dataset):
     #start the groups
     for i in range(0, util.number_of_groups(dataset)):
         R[str(i)] = 0
+    print(R)
     for pair in clusters:
         R[pair[3]] = R[pair[3]] + 1
         # if (pair[3] in R.keys()):
