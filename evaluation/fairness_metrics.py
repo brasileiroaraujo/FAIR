@@ -5,14 +5,19 @@ from evaluation import decompose_col_val
 from evaluation.decompose_col_val import decompose_srt_to_df
 
 
-def compute_bias(clusters):
+def compute_bias(clusters, dataset):
     k = len(clusters)
     R = {}
+
+    #start the groups
+    for i in range(0, util.number_of_groups(dataset)):
+        R[str(i)] = 0
     for pair in clusters:
-        if (pair[3] in R.keys()):
-            R[pair[3]] = R[pair[3]] + 1
-        else:
-            R[pair[3]] = 1
+        R[pair[3]] = R[pair[3]] + 1
+        # if (pair[3] in R.keys()):
+        #     R[pair[3]] = R[pair[3]] + 1
+        # else:
+        #     R[pair[3]] = 1
 
     values = list(R.values())
     print(values)

@@ -49,6 +49,9 @@ def pair_is_protected_by_group(tuple=None, dataset=None, return_condition=False,
     else:
         return eval(default_conditions_multiple_groups[dataset]) #if methods.protectedCond(dataset,0) is None else eval(methods.protectedCond(dataset,0))
 
+def number_of_groups(dataset):
+    return len(default_conditions_multiple_groups[dataset].split(' if '))
+
 default_conditions = {'Amazon-Google': "('microsoft' in str(tuple.left_manufacturer)) or ('microsoft' in str(tuple.right_manufacturer))",
                       'Beer': "('Red' in str(tuple.left_Beer_Name)) or ('Red' in str(tuple.right_Beer_Name))",
                       'DBLP-ACM': "('female' in d.get_gender(last_author_fname_l)) or ('female' in d.get_gender(last_author_fname_r))",

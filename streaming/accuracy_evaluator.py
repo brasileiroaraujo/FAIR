@@ -39,7 +39,7 @@ def compute_accuracy_precision(clusters, labed_file):
 def perform_evaluation(task, clusters, labed_file, results, ranking_mode):
     print('========FAIRNESS========')
 
-    R = fairness_metrics.compute_bias(clusters)
+    R = fairness_metrics.compute_bias(clusters, task)
     results["Bias"].append(R)
     print('R-bias: ', R)
     print('========================')
