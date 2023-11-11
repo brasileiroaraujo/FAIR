@@ -1,5 +1,5 @@
 import math
-
+import statistics
 import util
 from evaluation import decompose_col_val
 from evaluation.decompose_col_val import decompose_srt_to_df
@@ -85,9 +85,10 @@ def compute_TPRP_top_k(clusters, labed_file, dataset, ranking_mode):
     values = list(tp_fn_per_group.values())
 
     print(values)
+    mean_value = statistics.mean(values)
 
     #compute the max difference between the groups
-    tprp = 1.0 - min(values)
+    tprp = 1.0 - mean_value
 
     return tprp
 
@@ -130,9 +131,10 @@ def compute_PPVP(clusters, goldstandard):
     print(tp_fp_per_group)
 
     values = list(tp_fp_per_group.values())
+    mean_value = statistics.mean(values)
 
     #compute the max difference between the groups and the ideal value (i.e., 1)
-    ppvp = 1.0 - min(values)
+    ppvp = 1.0 - mean_value
 
     return ppvp
 
