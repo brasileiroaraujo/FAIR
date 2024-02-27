@@ -140,33 +140,33 @@ def setUpDitto(task, lm="distilbert", use_gpu=True, fp16="store_true",
 
     return config, model, threshold, summarizer, dk_injector
 
-def setUpGNEM(useful_field_num, gpu):
-    embedmodel = EmbedModel(useful_field_num=useful_field_num,device=gpu)
-
-    gcn_dim = 768
-    model = gcn(dims=[gcn_dim]*(args.gcn_layer + 1))
-
-    criterion = nn.CrossEntropyLoss().to(embedmodel.device)
-
-    # logger = set_logger()
-
-    if args.checkpoint_path:
-        checkpoint = torch.load(args.checkpoint_path)
-        if len(args.gpu) == 1:
-            new_state_dict = {k.replace('module.', ''): v for k, v in checkpoint["embed_model"].items()}
-            embedmodel.load_state_dict(new_state_dict)
-        else:
-            embedmodel.load_state_dict(checkpoint["embed_model"])
-        model.load_state_dict(checkpoint["model"])
-        test_type = [checkpoint["type"]]
-        # logger.info("Test Type:\t{}".format(checkpoint["type"]))
-    else:
-        test_type = args.test_type
-
-    embedmodel = embedmodel.to(embedmodel.device)
-    model = model.to(embedmodel.device)
-
-    return model, embedmodel, criterion
+# def setUpGNEM(useful_field_num, gpu):
+#     embedmodel = EmbedModel(useful_field_num=useful_field_num,device=gpu)
+#
+#     gcn_dim = 768
+#     model = gcn(dims=[gcn_dim]*(args.gcn_layer + 1))
+#
+#     criterion = nn.CrossEntropyLoss().to(embedmodel.device)
+#
+#     # logger = set_logger()
+#
+#     if args.checkpoint_path:
+#         checkpoint = torch.load(args.checkpoint_path)
+#         if len(args.gpu) == 1:
+#             new_state_dict = {k.replace('module.', ''): v for k, v in checkpoint["embed_model"].items()}
+#             embedmodel.load_state_dict(new_state_dict)
+#         else:
+#             embedmodel.load_state_dict(checkpoint["embed_model"])
+#         model.load_state_dict(checkpoint["model"])
+#         test_type = [checkpoint["type"]]
+#         # logger.info("Test Type:\t{}".format(checkpoint["type"]))
+#     else:
+#         test_type = args.test_type
+#
+#     embedmodel = embedmodel.to(embedmodel.device)
+#     model = model.to(embedmodel.device)
+#
+#     return model, embedmodel, criterion
 
 
 def open_csv(path):

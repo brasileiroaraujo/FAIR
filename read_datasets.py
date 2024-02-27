@@ -1,9 +1,7 @@
 #import py_entitymatching as em
 import sys
 import os
-import deepmatcher as dm
 import pandas as pd
-from matching import run_deepmatcher as match
 
 
 # code from https://colab.research.google.com/drive/1CQFejG3-KeuFmMChsEoOeqypTS7njyJb#scrollTo=qj-AXGxmR_gL
