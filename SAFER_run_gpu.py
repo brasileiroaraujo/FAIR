@@ -6,7 +6,6 @@ import time
 
 import torch
 import torch.nn as nn
-from logger import set_logger
 
 from EmbedModel import EmbedModel
 from GCN import gcn
@@ -149,7 +148,7 @@ def setUpGNEM(useful_field_num, gpu):
 
     criterion = nn.CrossEntropyLoss().to(embedmodel.device)
 
-    logger = set_logger()
+    # logger = set_logger()
 
     if args.checkpoint_path:
         checkpoint = torch.load(args.checkpoint_path)
@@ -160,7 +159,7 @@ def setUpGNEM(useful_field_num, gpu):
             embedmodel.load_state_dict(checkpoint["embed_model"])
         model.load_state_dict(checkpoint["model"])
         test_type = [checkpoint["type"]]
-        logger.info("Test Type:\t{}".format(checkpoint["type"]))
+        # logger.info("Test Type:\t{}".format(checkpoint["type"]))
     else:
         test_type = args.test_type
 
