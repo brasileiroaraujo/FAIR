@@ -7,8 +7,8 @@ import time
 import torch
 import torch.nn as nn
 
-from EmbedModel import EmbedModel
-from GCN import gcn
+# from EmbedModel import EmbedModel
+# from GCN import gcn
 from streaming.accuracy_evaluator import perform_evaluation
 from streaming.controller_fairER_streaming import match_rank_streaming
 import matcher
