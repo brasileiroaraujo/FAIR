@@ -10,7 +10,7 @@ import torch.nn as nn
 from EmbedModel import EmbedModel
 from GCN import gcn
 from streaming.accuracy_evaluator import perform_evaluation
-from streaming.controller_fairER_streaming import match_rank_streaming, match_gnem_rank_streaming
+from streaming.controller_fairER_streaming import match_rank_streaming
 import matcher
 
 
@@ -195,11 +195,11 @@ def main(args):
     if (matching_algorithm == 'ditto'):
         print('DITTO SELECTED')
         config, model, threshold, summarizer, dk_injector = setUpDitto(task="Structured/" + task, lm=lm, checkpoint_path="checkpoints/", threshold = threshold)
-    elif (matching_algorithm == 'gnem'):
-        gpu = 0
-        useful_field_num = len(pairs_to_compare.columns)/2 #TODO: VALIDATE THIS COMPUTATION
-        model, embed_model, criterion = setUpGNEM(useful_field_num=useful_field_num, gpu=gpu)
-        print('GNEM SELECTED')
+    # elif (matching_algorithm == 'gnem'):
+    #     gpu = 0
+    #     useful_field_num = len(pairs_to_compare.columns)/2 #TODO: VALIDATE THIS COMPUTATION
+    #     model, embed_model, criterion = setUpGNEM(useful_field_num=useful_field_num, gpu=gpu)
+    #     print('GNEM SELECTED')
     else:
         print('MATCHING ALGORITHM NOT AVAILABLE')
         exit(0)
@@ -233,10 +233,10 @@ def main(args):
             #PERFORM DITTO
             print('RUNNING DITTO')
             clusters, preds, av_time, nextProtected, time_to_match, time_to_rank = match_rank_streaming(task, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking, ranking_mode)
-        elif (matching_algorithm == 'gnem'):
-            #PERFORM GNEM
-            print('RUNNING GNEM')
-            clusters, av_time, nextProtected, time_to_match, time_to_rank = match_gnem_rank_streaming(task, list_of_pairs, nextProtected, model, embed_model, criterion, k_ranking, ranking_mode)
+        # elif (matching_algorithm == 'gnem'):
+        #     #PERFORM GNEM
+        #     print('RUNNING GNEM')
+        #     clusters, av_time, nextProtected, time_to_match, time_to_rank = match_gnem_rank_streaming(task, list_of_pairs, nextProtected, model, embed_model, criterion, k_ranking, ranking_mode)
         else:
             print('MATCHING ALGORITHM NOT AVAILABLE')
             exit(0)
