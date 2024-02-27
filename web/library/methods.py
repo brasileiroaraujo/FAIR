@@ -11,7 +11,7 @@ import base64
 
 from pathlib import Path
 sys.path.append(os.path.abspath('../'))
-import util, read_datasets, main_fairER, main_unfair, statistics
+import util, read_datasets, main_unfair, statistics#, main_fairER
 
 
 def runFairER(dataset, explanation):
@@ -29,10 +29,11 @@ def runFairER(dataset, explanation):
         Precondition: explanation is Integer, with two possible values: "0", "1".
     """
     cur_dir = os.path.abspath(".")
-    if int(explanation) == 0:
-        main_fairER.main(os.path.join(cur_dir, '..', 'resources','Datasets',dataset), 'joined_train.csv', 'joined_valid.csv', 'joined_test.csv', explanation)
-    else:
-        main_fairER.main(os.path.join(cur_dir, '..', 'resources','Datasets',dataset), 'merged_train.csv', 'merged_valid.csv', 'merged_test.csv', explanation)
+    print("NEED TO INCLUDE THE FOLLOWING CODE")
+    # if int(explanation) == 0:
+    #     main_fairER.main(os.path.join(cur_dir, '..', 'resources','Datasets',dataset), 'joined_train.csv', 'joined_valid.csv', 'joined_test.csv', explanation)
+    # else:
+    #     main_fairER.main(os.path.join(cur_dir, '..', 'resources','Datasets',dataset), 'merged_train.csv', 'merged_valid.csv', 'merged_test.csv', explanation)
 
 
 def runUnfair(dataset):
