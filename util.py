@@ -1,15 +1,34 @@
+import os
+import pickle
+
 import gender_guesser.detector as gender
-import web.library.methods as methods
+# import web.library.methods as methods
 
 d = gender.Detector(case_sensitive=False)  # to avoid creating many Detectors
 
+
+def protectedCond(dataset, explanation):
+    data = {}
+    if explanation == 0:
+        pickle_path = os.path.join('data', 'pickle_data', 'protected_conditions.pkl')
+    else:
+        pickle_path = os.path.join('data', 'pickle_data', 'protected_conditions_w_exp.pkl')
+    curr_dir = os.path.split(os.getcwd())[1]
+    if curr_dir == 'fairER':
+        pickle_path = 'web/' + pickle_path
+    if os.path.exists(pickle_path) and os.path.getsize(pickle_path) > 0:
+        with open(pickle_path, 'rb') as pkl_file:
+            data = pickle.load(pkl_file)
+
+    condition = data.get(dataset)
+    return condition
 
     # returns True if the given value (assumed to be coming from the protected attribute) is considered protected
     # if return_condition is True, the condition will be returned as string
 def pair_is_protected(tuple=None, dataset=None, return_condition=False, explanation=0):
    
     if(return_condition):
-        return default_conditions.get(dataset) if methods.protectedCond(dataset,0) is None else methods.protectedCond(dataset,0)
+        return default_conditions.get(dataset) if protectedCond(dataset,0) is None else protectedCond(dataset,0)
     else:
         try:
             if dataset == 'DBLP-ACM':
@@ -22,7 +41,7 @@ def pair_is_protected(tuple=None, dataset=None, return_condition=False, explanat
 
                 return last_author_is_female
             else:
-                return eval(default_conditions_w_exp[dataset]) if methods.protectedCond(dataset,1) is None else eval(methods.protectedCond(dataset,1))
+                return eval(default_conditions_w_exp[dataset]) if protectedCond(dataset,1) is None else eval(protectedCond(dataset,1))
         except AttributeError:
             if dataset == 'DBLP-ACM':
                 last_author_fname_l = str(tuple.left_authors).split(
@@ -34,7 +53,7 @@ def pair_is_protected(tuple=None, dataset=None, return_condition=False, explanat
 
                 return last_author_is_female
             else:
-                return eval(default_conditions[dataset]) if methods.protectedCond(dataset,0) is None else eval(methods.protectedCond(dataset,0))
+                return eval(default_conditions[dataset]) if protectedCond(dataset,0) is None else eval(protectedCond(dataset,0))
 
 def pair_is_protected_by_group(tuple=None, dataset=None, return_condition=False, explanation=0):
     if dataset == 'DBLP-ACM':
