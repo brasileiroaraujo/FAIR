@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(1, '../GNEM')
+sys.path.insert(2, '../GNEM')
 from _dummy_thread import exit
 
 import pandas as pd
