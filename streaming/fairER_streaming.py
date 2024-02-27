@@ -2,8 +2,8 @@ import time
 
 import data_sender
 from decompose_col_val import decompose_srt_to_full_df, format_gnem_output_to_df
-from matching import run_deepmatcher as dm
-from matching import run_deepmatcher_w_mojito as dmm
+# from matching import run_deepmatcher as dm
+# from matching import run_deepmatcher_w_mojito as dmm
 import os
 import util
 import pandas as pd
@@ -15,7 +15,7 @@ import torch
 import torch.nn.functional as F
 
 
-import web.library.methods as methods
+# import web.library.methods as methods
 
 
 def open_ditto_result(path, data):
