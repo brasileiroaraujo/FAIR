@@ -4,7 +4,8 @@ import sys
 
 import evaluation.accuracy as eval
 import evaluation.fairness as f_eval
-from streaming.fairER_streaming import run, run_streaming, run_matching_ranking_streaming
+from streaming.fairER_streaming import run, run_streaming, run_matching_ranking_streaming, \
+    run_matching_gnem_ranking_streaming
 
 import web.library.methods as methods
 
@@ -72,6 +73,19 @@ def match_rank_streaming(data, list_of_pairs, nextProtected, config, model, thre
     av_time += ex_time
 
     return clusters, preds, av_time, nextProtected, time_to_match, time_to_rank
+
+def match_gnem_rank_streaming(data, list_of_pairs, nextProtected, model, embed_model, criterion, k_ranking, ranking_mode):
+    print('\n', 'Streaming processing ... ' + data, '\n')
+    # data_path = os.path.join(BASE_PATH, 'resources','Datasets',data)
+
+    av_time = 0
+    # for _ in range(10):
+    start_time = time.time()
+    clusters, nextProtected, time_to_match, time_to_rank = run_matching_gnem_ranking_streaming(data=data, list_of_pairs=list_of_pairs, nextProtected=nextProtected, k_results=k_ranking, model=model, embed_model=embed_model, ranking_mode=ranking_mode, criterion=criterion)
+    ex_time = time.time() - start_time
+    av_time += ex_time
+
+    return clusters, av_time, nextProtected, time_to_match, time_to_rank
 
 
 if __name__ == '__main__':

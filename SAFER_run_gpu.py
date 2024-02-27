@@ -1,11 +1,19 @@
 import sys
+from _dummy_thread import exit
 
 import pandas as pd
 import time
 
+import torch
+import torch.nn as nn
+from logger import set_logger
+
+from EmbedModel import EmbedModel
+from GCN import gcn
 from streaming.accuracy_evaluator import perform_evaluation
-from streaming.controller_fairER_streaming import match_rank_streaming
+from streaming.controller_fairER_streaming import match_rank_streaming, match_gnem_rank_streaming
 import matcher
+
 
 
 
@@ -133,6 +141,35 @@ def setUpDitto(task, lm="distilbert", use_gpu=True, fp16="store_true",
 
     return config, model, threshold, summarizer, dk_injector
 
+def setUpGNEM(useful_field_num, gpu):
+    embedmodel = EmbedModel(useful_field_num=useful_field_num,device=gpu)
+
+    gcn_dim = 768
+    model = gcn(dims=[gcn_dim]*(args.gcn_layer + 1))
+
+    criterion = nn.CrossEntropyLoss().to(embedmodel.device)
+
+    logger = set_logger()
+
+    if args.checkpoint_path:
+        checkpoint = torch.load(args.checkpoint_path)
+        if len(args.gpu) == 1:
+            new_state_dict = {k.replace('module.', ''): v for k, v in checkpoint["embed_model"].items()}
+            embedmodel.load_state_dict(new_state_dict)
+        else:
+            embedmodel.load_state_dict(checkpoint["embed_model"])
+        model.load_state_dict(checkpoint["model"])
+        test_type = [checkpoint["type"]]
+        logger.info("Test Type:\t{}".format(checkpoint["type"]))
+    else:
+        test_type = args.test_type
+
+    embedmodel = embedmodel.to(embedmodel.device)
+    model = model.to(embedmodel.device)
+
+    return model, embedmodel, criterion
+
+
 def open_csv(path):
     return pd.read_csv(path, header=None, sep='\n')
 
@@ -146,6 +183,7 @@ def main(args):
     # k_batch = int(args[5]) #5742
     threshold = float(args[4])
     ranking_mode = args[7]
+    matching_algorithm = args[8]
     incremental_clusters = []
 
     results = {"top-5":[], "top-10":[],	"top-15":[], "top-20":[], "time_to_match":[], "time_to_rank":[], "total_time":[], "PPVP":[], "TPRP":[], "Bias":[]}
@@ -155,7 +193,17 @@ def main(args):
 
     pairs_to_compare = open_csv(BASE_PATH + task + '/test.txt')
 
-    config, model, threshold, summarizer, dk_injector = setUpDitto(task="Structured/" + task, lm=lm, checkpoint_path="checkpoints/", threshold = threshold)
+    if (matching_algorithm == 'ditto'):
+        print('DITTO SELECTED')
+        config, model, threshold, summarizer, dk_injector = setUpDitto(task="Structured/" + task, lm=lm, checkpoint_path="checkpoints/", threshold = threshold)
+    elif (matching_algorithm == 'gnem'):
+        gpu = 0
+        useful_field_num = len(pairs_to_compare.columns)/2 #TODO: VALIDATE THIS COMPUTATION
+        model, embed_model, criterion = setUpGNEM(useful_field_num=useful_field_num, gpu=gpu)
+        print('GNEM SELECTED')
+    else:
+        print('MATCHING ALGORITHM NOT AVAILABLE')
+        exit(0)
 
     print("---- Ready to Consume ----")
 
@@ -180,9 +228,19 @@ def main(args):
         print("pairs size: " + str(len(lines.index)))
         # n_batches = n_batches + (window)
 
-        #call ditto to match
-        #PERFORM DITTO
-        clusters, preds, av_time, nextProtected, time_to_match, time_to_rank = match_rank_streaming(task, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking, ranking_mode)
+        #call to match
+
+        if (matching_algorithm == 'ditto'):
+            #PERFORM DITTO
+            print('RUNNING DITTO')
+            clusters, preds, av_time, nextProtected, time_to_match, time_to_rank = match_rank_streaming(task, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking, ranking_mode)
+        elif (matching_algorithm == 'gnem'):
+            #PERFORM GNEM
+            print('RUNNING GNEM')
+            clusters, av_time, nextProtected, time_to_match, time_to_rank = match_gnem_rank_streaming(task, list_of_pairs, nextProtected, model, embed_model, criterion, k_ranking, ranking_mode)
+        else:
+            print('MATCHING ALGORITHM NOT AVAILABLE')
+            exit(0)
 
         #RANKING
         if ranking_mode == 'none':

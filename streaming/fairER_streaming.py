@@ -1,5 +1,7 @@
 import time
 
+import data_sender
+from decompose_col_val import decompose_srt_to_full_df, format_gnem_output_to_df
 from matching import run_deepmatcher as dm
 from matching import run_deepmatcher_w_mojito as dmm
 import os
@@ -9,6 +11,8 @@ from clustering import fair_unique_mapping_clustering as fumc
 import sys
 sys.path.insert(1, '../ditto')
 import matcher
+import torch
+import torch.nn.functional as F
 
 
 import web.library.methods as methods
@@ -263,6 +267,125 @@ def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results
     print("--- SAFER Ranking ...  ---")
     start_time = time.time()
     preds = open_ditto_result(path_matches, data)
+    clusters = []
+
+    if len(preds) > 0:
+        preds = preds.sort_values(by='match_score', ascending=False)
+
+        column_key = getKey(data)
+
+        initial_pairs = [(a.__getattribute__('left_' + column_key), a.__getattribute__('right_' + column_key),
+                          a.match_score, (util.pair_is_protected_by_group(a, data, False) if ranking_mode == 'm-fair' or ranking_mode == 'none'
+                                          else util.pair_is_protected(a, data, False)))
+                         for a in preds.itertuples(index=False)] #Ditto
+
+        if ranking_mode == 'none':
+            print("Skipping Ranking Step!")
+            clusters = initial_pairs[0:k_results]
+        elif ranking_mode == 'm-fair':
+            print("Running m-fair")
+            clusters = fumc.run_steraming_ranking_by_groups(initial_pairs, 1, k_results) #1 = the first protected group
+        else: #default fair-er ranking
+            print("Running fair-er")
+            clusters = fumc.run_steraming(initial_pairs, True, k_results) #True = first the protected group
+
+        print("\nclustering results:\n", clusters)
+        #return clusters, preds, nextProtected
+
+    else:
+        print("\nNo matches detected.\n")
+
+    time_to_rank = time.time() - start_time
+    print('Time to rank: ' + str(time_to_rank))
+
+    return clusters, preds, nextProtected, time_to_match, time_to_rank
+
+def fetch_edge(batch):
+    edges = []
+    types = []
+    for ex in batch:
+        type = ex["type"]
+        center_id = ex["center"][0]
+        neighbors = []
+        if "neighbors_mask" in ex:
+            for i, n in enumerate(ex["neighbors"]):
+                if ex["neighbors_mask"][i] == 0:
+                    continue
+                neighbors.append(n)
+        else:
+            neighbors = ex["neighbors"]
+        if type == 'l':
+            edges += [[center_id, n[0]] for n in neighbors]
+            types += [0] * len(neighbors)
+        elif type == 'r':
+            edges += [[n[0], center_id] for n in neighbors]
+            types += [1] * len(neighbors)
+        else:
+            raise NotImplementedError
+    return edges, types
+
+
+def compute_predictions(edges, prediction_values, scores, labels):
+    df = pd.DataFrame()
+
+    if len(prediction_values) == 0:
+        return df
+
+    for i in range(len(edges)-1):
+        if int(prediction_values[i]) == 1:
+            df = pd.concat([df,format_gnem_output_to_df(edges[i], scores[i], labels[i])], axis=1)
+
+    return df
+
+
+def run_matching_gnem_ranking_streaming(data, list_of_pairs, nextProtected, k_results, model, embed_model, criterion, ranking_mode):
+    batch = data_sender.put_in_gnem_input_form(list_of_pairs)
+    ###########
+    # Matching with GNEM
+    ###########
+    print("--- Matching with GNEM ...  ---")
+
+    #sending the pairs to be matched
+    start_time = time.time()
+    model.eval()
+    embed_model.eval()
+
+    j=0
+    with torch.no_grad():
+        edge,type = fetch_edge(batch)
+        feature, A, label, masks = embed_model(batch)
+        masks = masks.view(-1)
+        label = label.view(-1)[masks == 1].long()
+        pred = model(feature, A)
+        pred = pred[masks == 1]
+        loss = criterion(pred, label)
+        pred = F.softmax(pred, dim=1)
+
+        assert pred.shape[0] == label.shape[0]
+        scores = pred[:,1].detach().cpu().numpy().tolist()
+        edges = edge
+        labels = label.detach().cpu().numpy().tolist()
+        types = type
+        prediction_values = (torch.argmax(pred, dim=1).long()).detach().cpu().numpy().tolist()
+
+    preds = compute_predictions(edges, prediction_values, scores, labels)
+        # print(edges)
+        # print('========')
+        # print(scores)
+        # print('===++===')
+        # print(labels)
+        # print('===--===')
+        # print(prediction_values)
+        # print( '===**===')
+    time_to_match = time.time() - start_time
+    print('Time to match: ' + str(time_to_match))
+
+
+    ###########
+    # Ranking
+    ###########
+    print("--- SAFER Ranking ...  ---")
+    start_time = time.time()
     clusters = []
 
     if len(preds) > 0:
