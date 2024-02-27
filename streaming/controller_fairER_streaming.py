@@ -7,7 +7,7 @@ import evaluation.fairness as f_eval
 from streaming.fairER_streaming import run, run_streaming, run_matching_ranking_streaming, \
     run_matching_gnem_ranking_streaming
 
-import web.library.methods as methods
+# import web.library.methods as methods
 
 BASE_PATH = "D:\\IntelliJ_Workspace\\fairER\\"
 
