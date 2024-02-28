@@ -201,7 +201,7 @@ def main(args):
         print('DITTO SELECTED')
         config, model, threshold, summarizer, dk_injector = setUpDitto(task="Structured/" + task, lm=lm, checkpoint_path="checkpoints/", threshold = threshold)
     elif (matching_algorithm == 'gnem'):
-        useful_field_num = len(pairs_to_compare.columns)/2 #TODO: VALIDATE THIS COMPUTATION
+        useful_field_num = pairs_to_compare.iloc[0].count('COL')/2 #TODO: VALIDATE THIS COMPUTATION
         print("useful_field_num ", useful_field_num)
         model, embed_model, criterion = setUpGNEM(data=task, useful_field_num=useful_field_num)
         print('GNEM SELECTED')
