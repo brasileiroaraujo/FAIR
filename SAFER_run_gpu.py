@@ -156,9 +156,7 @@ def setUpGNEM(data, useful_field_num, gpu=[0], gcn_layer=1):
     if checkpoint_path:
         checkpoint = torch.load(checkpoint_path)
         if len(gpu) == 1:
-            print("checkpoint[embed_model]: ", checkpoint["embed_model"])
             new_state_dict = {k.replace('module.', ''): v for k, v in checkpoint["embed_model"].items()}
-            print("new_state_dict: ", new_state_dict)
             embedmodel.load_state_dict(new_state_dict)
         else:
             embedmodel.load_state_dict(checkpoint["embed_model"])
@@ -243,7 +241,7 @@ def main(args):
         elif (matching_algorithm == 'gnem'):
             #PERFORM GNEM
             print('RUNNING GNEM')
-            clusters, av_time, nextProtected, time_to_match, time_to_rank = match_gnem_rank_streaming(task, list_of_pairs, nextProtected, model, embed_model, criterion, k_ranking, ranking_mode)
+            clusters, av_time, nextProtected, time_to_match, time_to_rank = match_gnem_rank_streaming(task, lines, nextProtected, model, embed_model, criterion, k_ranking, ranking_mode)
         else:
             print('MATCHING ALGORITHM NOT AVAILABLE')
             exit(0)
