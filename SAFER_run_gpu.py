@@ -156,7 +156,9 @@ def setUpGNEM(data, useful_field_num, gpu=[0], gcn_layer=1):
     if checkpoint_path:
         checkpoint = torch.load(checkpoint_path)
         if len(gpu) == 1:
+            print("checkpoint[embed_model]: ", checkpoint["embed_model"])
             new_state_dict = {k.replace('module.', ''): v for k, v in checkpoint["embed_model"].items()}
+            print("new_state_dict: ", new_state_dict)
             embedmodel.load_state_dict(new_state_dict)
         else:
             embedmodel.load_state_dict(checkpoint["embed_model"])
