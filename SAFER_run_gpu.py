@@ -141,19 +141,21 @@ def setUpDitto(task, lm="distilbert", use_gpu=True, fp16="store_true",
 
     return config, model, threshold, summarizer, dk_injector
 
-def setUpGNEM(useful_field_num, gpu):
+def setUpGNEM(data, useful_field_num, gpu=[0], gcn_layer=1):
+    data = (data.replace("-", "_")).lower()
+    checkpoint_path = "../pretrained/"+data+"_bert.pth"
     embedmodel = EmbedModel(useful_field_num=useful_field_num,device=gpu)
 
     gcn_dim = 768
-    model = gcn(dims=[gcn_dim]*(args.gcn_layer + 1))
+    model = gcn(dims=[gcn_dim]*(gcn_layer + 1))
 
     criterion = nn.CrossEntropyLoss().to(embedmodel.device)
 
     # logger = set_logger()
 
-    if args.checkpoint_path:
-        checkpoint = torch.load(args.checkpoint_path)
-        if len(args.gpu) == 1:
+    if checkpoint_path:
+        checkpoint = torch.load(checkpoint_path)
+        if len(gpu) == 1:
             new_state_dict = {k.replace('module.', ''): v for k, v in checkpoint["embed_model"].items()}
             embedmodel.load_state_dict(new_state_dict)
         else:
@@ -161,8 +163,8 @@ def setUpGNEM(useful_field_num, gpu):
         model.load_state_dict(checkpoint["model"])
         test_type = [checkpoint["type"]]
         # logger.info("Test Type:\t{}".format(checkpoint["type"]))
-    else:
-        test_type = args.test_type
+    # else:
+    #     test_type = test_type
 
     embedmodel = embedmodel.to(embedmodel.device)
     model = model.to(embedmodel.device)
@@ -184,8 +186,8 @@ def main(args):
     threshold = float(args[4])
     ranking_mode = args[7]
     matching_algorithm = args[8]
-    gpu = [int(i) for i in args[9].split("_")]
-    print("gpu: ", gpu)
+    # gpu = [int(i) for i in args[9].split("_")]
+    # print("gpu: ", gpu)
     incremental_clusters = []
 
     results = {"top-5":[], "top-10":[],	"top-15":[], "top-20":[], "time_to_match":[], "time_to_rank":[], "total_time":[], "PPVP":[], "TPRP":[], "Bias":[]}
@@ -200,7 +202,7 @@ def main(args):
         config, model, threshold, summarizer, dk_injector = setUpDitto(task="Structured/" + task, lm=lm, checkpoint_path="checkpoints/", threshold = threshold)
     elif (matching_algorithm == 'gnem'):
         useful_field_num = len(pairs_to_compare.columns)/2 #TODO: VALIDATE THIS COMPUTATION
-        model, embed_model, criterion = setUpGNEM(useful_field_num=useful_field_num, gpu=gpu)
+        model, embed_model, criterion = setUpGNEM(data=task, useful_field_num=useful_field_num)
         print('GNEM SELECTED')
     else:
         print('MATCHING ALGORITHM NOT AVAILABLE')
