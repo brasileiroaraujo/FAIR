@@ -184,7 +184,7 @@ def main(args):
     threshold = float(args[4])
     ranking_mode = args[7]
     matching_algorithm = args[8]
-    gpu = [int(i) for i in args[9].split(" ")]
+    gpu = [int(i) for i in args[9].split("_")]
     print("gpu: ", gpu)
     incremental_clusters = []
 
