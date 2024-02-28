@@ -143,7 +143,7 @@ def setUpDitto(task, lm="distilbert", use_gpu=True, fp16="store_true",
 
 def setUpGNEM(data, useful_field_num, gpu=[0], gcn_layer=1):
     data = (data.replace("-", "_")).lower()
-    checkpoint_path = "../pretrained/"+data+"_bert.pth"
+    checkpoint_path = "pretrained/"+data+"_bert.pth"
     embedmodel = EmbedModel(useful_field_num=useful_field_num,device=gpu)
 
     gcn_dim = 768
@@ -202,6 +202,7 @@ def main(args):
         config, model, threshold, summarizer, dk_injector = setUpDitto(task="Structured/" + task, lm=lm, checkpoint_path="checkpoints/", threshold = threshold)
     elif (matching_algorithm == 'gnem'):
         useful_field_num = len(pairs_to_compare.columns)/2 #TODO: VALIDATE THIS COMPUTATION
+        print("useful_field_num ", useful_field_num)
         model, embed_model, criterion = setUpGNEM(data=task, useful_field_num=useful_field_num)
         print('GNEM SELECTED')
     else:
