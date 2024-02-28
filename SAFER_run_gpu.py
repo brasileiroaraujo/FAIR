@@ -184,6 +184,8 @@ def main(args):
     threshold = float(args[4])
     ranking_mode = args[7]
     matching_algorithm = args[8]
+    gpu = [int(i) for i in args[9].split(" ")]
+    print("gpu: ", gpu)
     incremental_clusters = []
 
     results = {"top-5":[], "top-10":[],	"top-15":[], "top-20":[], "time_to_match":[], "time_to_rank":[], "total_time":[], "PPVP":[], "TPRP":[], "Bias":[]}
@@ -197,7 +199,6 @@ def main(args):
         print('DITTO SELECTED')
         config, model, threshold, summarizer, dk_injector = setUpDitto(task="Structured/" + task, lm=lm, checkpoint_path="checkpoints/", threshold = threshold)
     elif (matching_algorithm == 'gnem'):
-        gpu = 0
         useful_field_num = len(pairs_to_compare.columns)/2 #TODO: VALIDATE THIS COMPUTATION
         model, embed_model, criterion = setUpGNEM(useful_field_num=useful_field_num, gpu=gpu)
         print('GNEM SELECTED')
