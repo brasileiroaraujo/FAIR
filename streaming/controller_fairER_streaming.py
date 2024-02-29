@@ -81,7 +81,7 @@ def match_gnem_rank_streaming(data, list_of_pairs, nextProtected, model, embed_m
     av_time = 0
     # for _ in range(10):
     start_time = time.time()
-    clusters, nextProtected, time_to_match, time_to_rank = run_matching_gnem_ranking_streaming(data=data, list_of_pairs=list_of_pairs, nextProtected=nextProtected, k_results=k_ranking, model=model, embed_model=embed_model, ranking_mode=ranking_mode, criterion=criterion)
+    clusters, preds, nextProtected, time_to_match, time_to_rank = run_matching_gnem_ranking_streaming(data=data, list_of_pairs=list_of_pairs, nextProtected=nextProtected, k_results=k_ranking, model=model, embed_model=embed_model, ranking_mode=ranking_mode, criterion=criterion)
     ex_time = time.time() - start_time
     av_time += ex_time
 
