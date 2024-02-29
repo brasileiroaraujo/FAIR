@@ -17,7 +17,7 @@ def compute_accuracy_precision(clusters, labed_file):
 
     for pair in clusters:
         for result in labed_file:
-            if(pair[0] == result.split('\t')[0].split('VAL')[1].split('COL')[0] and pair[1] == result.split('\t')[1].split('VAL')[1].split('COL')[0]):
+            if(pair[0].strip() == result.split('\t')[0].split('VAL')[1].split('COL')[0].strip() and pair[1].strip() == result.split('\t')[1].split('VAL')[1].split('COL')[0].strip()):
                 if(result[len(result)-1] == '1'):
                     correct+=1
                     break #do not need to continue

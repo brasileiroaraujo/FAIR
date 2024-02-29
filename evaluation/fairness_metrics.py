@@ -138,25 +138,6 @@ def compute_PPVP(clusters, goldstandard):
 
     return ppvp
 
-# clusters = [('adobe premiere pro cs3', 'adobe premiere pro cs3', 0.9656693935394287, 0), ('adobe dreamweaver cs3 upgrade', 'adobe dreamweaver cs3 upgrade', 0.9655036926269531, 0), ('icopydvds2 ultra by digital wunders', 'global marketing partners icopydvds2 ultra by digital wunders', 0.9655009508132935, 0), ('adobe acrobat distiller svr v6-cd sun 100u 42050106 )', 'adobe 42050106 acrobat distiller svr v6-cd sun 100u', 0.9654878973960876, 0), ('acad corel painter x pc/mac', 'corel painter x', 0.965453565120697, 0), ('intervideo windvd 8 platinum', 'corel intervideo windvd 8 platinum software for windows authoring software', 0.9654138088226318, 0), ('adobe premiere pro cs3', 'adobe premiere pro cs3 video editing software for windows professional editing software', 0.9654093384742737, 0), ('reel deal slots mystic forest', 'phantom efx reel deal slots mystic forest', 0.9653741717338562, 0), ('emedia intermediate guitar method win/mac', 'emedia music corp emedia intermediate guitar method', 0.9653590321540833, 0), ('bias peak le 5', 'bias peak le 5 software music production software', 0.9653339385986328, 0), ('sony sound forge audio studio 8', 'sony media software sound forge audio studio 8 software music production software', 0.9653218388557434, 2), ('red hat enterprise linux ws v. 4 update 4 license 1 workstation rl296aa )', 'rl296aa red hat enterprise linux ws v. 4 update 4 license 1 workstation', 0.9652944803237915, 0), ('musicalis guitar workshop', 'musicalis universal guitar workshop', 0.9652790427207947, 0), ('rome total war gold edition', 'sega of america inc rome total war gold edition', 0.9652754068374634, 0), ('xtreme photostory on cd and dvd 6', 'magix entertainment corp. xtreme photostory on cd and dvd 6', 0.9652734994888306, 0), ('adobe after effects cs3', 'adobe after effects cs3 professional software for mac effects software', 0.9652574062347412, 0), ('sony super duper music looper', 'sony media software super duper music looper software music production software', 0.965206503868103, 2), ('genuine fractals genuine fractals print pro 1u', 'onone software genuine fractals print pro software', 0.9652037620544434, 0), ('adobe after effects cs3', 'adobe after effects cs3 professional software for windows effects software', 0.9652023911476135, 0), ('adobe premiere pro cs3', 'adobe premiere pro cs3 video editing software for mac av production software', 0.9651574492454529, 0)]
-# with open('D:/IntelliJ_Workspace/fairER/data/er_magellan/Structured/Amazon-Google/test.txt', encoding="utf8") as file:
-#     labed_file = [line.rstrip() for line in file]
-#
-# k = len(clusters)
-# tp_fp_per_group = compute_tp_fp_by_group(clusters, labed_file)
-# for key in tp_fp_per_group.keys():
-#     tp, fp = tp_fp_per_group.get(key)
-#     ppv = tp/(tp+fp)
-#     tp_fp_per_group[key] = ppv
-# print(tp_fp_per_group)
-#
-# values = list(tp_fp_per_group.values())
-# mean_value = np.mean(values)
-#
-# #compute the max difference between the groups and the ideal value (i.e., 1)
-# ppvp = 1.0 - mean_value
-#
-# print(ppvp)
 
 
 
