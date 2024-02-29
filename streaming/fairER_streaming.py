@@ -333,7 +333,7 @@ def compute_predictions(edges, prediction_values, scores, labels):
 
     for i in range(len(edges)-1):
         if int(prediction_values[i]) == 1: #only the candidates predicted as match will be consider
-            df = pd.concat([df,format_gnem_output_to_df(edges[i], scores[i], labels[i])], axis=1)
+            df = pd.concat([df,format_gnem_output_to_df(edges[i], scores[i], labels[i])])
 
     return df
 
