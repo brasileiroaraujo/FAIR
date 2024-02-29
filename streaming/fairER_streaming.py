@@ -332,7 +332,7 @@ def compute_predictions(edges, prediction_values, scores, labels):
         return df
 
     for i in range(len(edges)-1):
-        if int(prediction_values[i]) == 1:
+        if int(prediction_values[i]) == 1: #only the candidates predicted as match will be consider
             df = pd.concat([df,format_gnem_output_to_df(edges[i], scores[i], labels[i])], axis=1)
 
     return df
@@ -388,6 +388,7 @@ def run_matching_gnem_ranking_streaming(data, list_of_pairs, nextProtected, k_re
     start_time = time.time()
     clusters = []
 
+    print(preds.columns)
     if len(preds) > 0:
         preds = preds.sort_values(by='match_score', ascending=False)
 
