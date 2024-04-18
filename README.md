@@ -15,8 +15,8 @@ We mainly recommend the use of cuda:<br/>
 CUDA Toolkit 11.0
 
 Since the approach hosts Ditto and GNEM matching tools, please find the respective projects:<br/>
-https://github.com/megagonlabs/ditto
-https://github.com/ChenRunjin/GNEM
+https://github.com/megagonlabs/ditto<br/>
+https://github.com/ChenRunjin/GNEM<br/>
 
 
 Now you can run the local version using the command:<br/>
