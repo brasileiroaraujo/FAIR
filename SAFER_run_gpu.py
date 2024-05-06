@@ -14,6 +14,10 @@ from streaming.accuracy_evaluator import perform_evaluation
 from streaming.controller_fairER_streaming import match_rank_streaming, match_gnem_rank_streaming
 import matcher
 
+import subprocess
+import sys
+from importlib_metadata import version
+
 
 
 
@@ -115,6 +119,10 @@ def fairness_ranking(candidates, nextProtected, results_limit):
 
 def setUpDitto(task, lm="distilbert", use_gpu=True, fp16="store_true",
                checkpoint_path='checkpoints/', dk=None, summarize="store_true", max_len=256, threshold=0):
+    #ditto dependency with gnem conflict
+    if version('transformers') != '3.4.0':
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==3.4.0"])
+
     print("---- Configuring Ditto ----")
     # load the models
     matcher.set_seed(123)
@@ -142,6 +150,10 @@ def setUpDitto(task, lm="distilbert", use_gpu=True, fp16="store_true",
     return config, model, threshold, summarizer, dk_injector
 
 def setUpGNEM(data, useful_field_num, gpu=[0], gcn_layer=1):
+    #gnem dependency with ditto conflict
+    if version('transformers') != '2.8.0':
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==2.8.0"])
+
     data = (data.replace("-", "_")).lower()
     checkpoint_path = "pretrained/"+data+"_bert.pth"
     embedmodel = EmbedModel(useful_field_num=useful_field_num,device=gpu)
@@ -269,6 +281,7 @@ def main(args):
         perform_evaluation(task, incremental_clusters, reference, results, ranking_mode)
 
         time.sleep(int(args[6]))
+
     print(results)
     file.close()
 
