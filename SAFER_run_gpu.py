@@ -1,7 +1,5 @@
 import sys
 
-import distribution_evaluator
-
 sys.path.insert(2, '../GNEM')
 from _dummy_thread import exit
 
