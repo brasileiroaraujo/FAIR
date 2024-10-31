@@ -1,5 +1,4 @@
 import sys
-
 sys.path.insert(2, '../GNEM')
 from _dummy_thread import exit
 
@@ -16,6 +15,7 @@ from streaming.controller_fairER_streaming import match_rank_streaming, match_gn
 import matcher
 
 import subprocess
+import sys
 from importlib_metadata import version
 
 
@@ -116,26 +116,12 @@ def fairness_ranking(candidates, nextProtected, results_limit):
 
     return matches
 
-def install_and_import(package):
-    import importlib
-    try:
-        importlib.import_module(package)
-    except ImportError:
-        import pip
-        pip.main(['install', package])
-    finally:
-        package = package[0:package.find('=')]
-        import site
-        from importlib import reload
-        globals()[package] = importlib.import_module(package)
-        reload(site)
-
-
 
 def setUpDitto(task, lm="distilbert", use_gpu=True, fp16="store_true",
                checkpoint_path='checkpoints/', dk=None, summarize="store_true", max_len=256, threshold=0):
+    #ditto dependency with gnem conflict
     if version('transformers') != '3.4.0':
-        install_and_import('transformers==3.4.0')
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==3.4.0"])
 
     print("---- Configuring Ditto ----")
     # load the models
@@ -164,6 +150,10 @@ def setUpDitto(task, lm="distilbert", use_gpu=True, fp16="store_true",
     return config, model, threshold, summarizer, dk_injector
 
 def setUpGNEM(data, useful_field_num, gpu=[0], gcn_layer=1):
+    #gnem dependency with ditto conflict
+    if version('transformers') != '2.8.0':
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==2.8.0"])
+
     data = (data.replace("-", "_")).lower()
     checkpoint_path = "pretrained/"+data+"_bert.pth"
     embedmodel = EmbedModel(useful_field_num=useful_field_num,device=gpu)
@@ -179,7 +169,7 @@ def setUpGNEM(data, useful_field_num, gpu=[0], gcn_layer=1):
         checkpoint = torch.load(checkpoint_path)
         if len(gpu) == 1:
             new_state_dict = {k.replace('module.', ''): v for k, v in checkpoint["embed_model"].items()}
-            embedmodel.load_state_dict(new_state_dict, False)
+            embedmodel.load_state_dict(new_state_dict)
         else:
             embedmodel.load_state_dict(checkpoint["embed_model"])
         model.load_state_dict(checkpoint["model"])
@@ -218,9 +208,6 @@ def main(args):
         labed_file = [line.rstrip() for line in file]
 
     pairs_to_compare = open_csv(BASE_PATH + task + '/test.txt')
-
-    #perform the distribution analysis
-    # distribution_evaluator.run_evaluator(pairs_to_compare, ['left_venue', 'right_venue'])
 
     if (matching_algorithm == 'ditto'):
         print('DITTO SELECTED')
@@ -263,19 +250,17 @@ def main(args):
 
         if (matching_algorithm == 'ditto'):
             #PERFORM DITTO
-            print('RUNNING DITTO')
             pairs_processed = pairs_processed + len(list_of_pairs)
+            print('RUNNING DITTO')
             clusters, preds, av_time, nextProtected, time_to_match, time_to_rank = match_rank_streaming(task, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking, ranking_mode)
         elif (matching_algorithm == 'gnem'):
             #PERFORM GNEM
-            print('RUNNING GNEM')
             pairs_processed = pairs_processed + len(lines)
+            print('RUNNING GNEM')
             clusters, av_time, nextProtected, time_to_match, time_to_rank = match_gnem_rank_streaming(task, lines, nextProtected, model, embed_model, criterion, k_ranking, ranking_mode)
         else:
             print('MATCHING ALGORITHM NOT AVAILABLE')
             exit(0)
-
-
 
         #RANKING
         if ranking_mode == 'none':
@@ -295,12 +280,16 @@ def main(args):
 
         print('clusters:')
         print(incremental_clusters)
-        increment += 1
-        print("Increments processed: " + str(increment))
-        print("Pairs (processed): " + str(pairs_processed))
 
         #evaluate effectivenss and fairness
         perform_evaluation(task, incremental_clusters, reference, results, ranking_mode)
+
+        increment += 1
+        print("Increments processed: " + str(increment))
+        print("Pairs (processed): " + str(pairs_processed))
+        print("time_to_match: " + str(results["time_to_match"]))
+        print("time_to_rank: " + str(results["time_to_rank"]))
+        print("total_time: " + str(results["total_time"]))
 
         time.sleep(int(args[6]))
 
