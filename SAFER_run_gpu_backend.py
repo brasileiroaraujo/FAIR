@@ -1,7 +1,4 @@
 import sys
-
-# from data_distribution_assessment import data_assessment_menager
-
 sys.path.insert(2, '../GNEM')
 from _dummy_thread import exit
 
@@ -20,9 +17,6 @@ import matcher
 import subprocess
 import sys
 from importlib_metadata import version
-
-
-
 
 # ct=Consumer({'bootstrap.servers':'localhost:9092','group.id':'python-consumer','auto.offset.reset':'earliest'})
 #
@@ -119,14 +113,31 @@ def fairness_ranking(candidates, nextProtected, results_limit):
 
     return matches
 
+def install_and_import(package):
+    import importlib
+    try:
+        importlib.import_module(package)
+    except ImportError:
+        import pip
+        pip.main(['install', package])
+    finally:
+        package = package[0:package.find('=')]
+        import site
+        from importlib import reload
+        globals()[package] = importlib.import_module(package)
+        reload(site)
+
+
 
 def setUpDitto(task, lm="distilbert", use_gpu=True, fp16="store_true",
                checkpoint_path='checkpoints/', dk=None, summarize="store_true", max_len=256, threshold=0):
-    #ditto dependency with gnem conflict
-    # if version('transformers') != '3.4.0':
-    #     subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==3.4.0"])
+    # ditto dependency with gnem conflict
+    if version('transformers') != '3.4.0':
+        install_and_import('transformers==3.4.0')
+        #subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==3.4.0"])
 
     print("---- Configuring Ditto ----")
+    print(version('transformers'))
     # load the models
     matcher.set_seed(123)
     config, model = matcher.load_model(task, checkpoint_path,
@@ -154,8 +165,9 @@ def setUpDitto(task, lm="distilbert", use_gpu=True, fp16="store_true",
 
 def setUpGNEM(data, useful_field_num, gpu=[0], gcn_layer=1):
     #gnem dependency with ditto conflict
-    if version('transformers') != '2.8.0':
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==2.8.0"])
+    #if version('transformers') != '2.8.0':
+        #install_and_import('transformers==2.8.0')
+        #subprocess.check_call([sys.executable, "-m", "pip", "install", "transformers==2.8.0"])
 
     data = (data.replace("-", "_")).lower()
     checkpoint_path = "pretrained/"+data+"_bert.pth"
@@ -172,6 +184,7 @@ def setUpGNEM(data, useful_field_num, gpu=[0], gcn_layer=1):
         checkpoint = torch.load(checkpoint_path)
         if len(gpu) == 1:
             new_state_dict = {k.replace('module.', ''): v for k, v in checkpoint["embed_model"].items()}
+            embedmodel._load_from_state_dict(state_dict=new_state_dict)
             embedmodel.load_state_dict(new_state_dict)
         else:
             embedmodel.load_state_dict(checkpoint["embed_model"])
@@ -190,7 +203,7 @@ def setUpGNEM(data, useful_field_num, gpu=[0], gcn_layer=1):
 def open_csv(path):
     return pd.read_csv(path, header=None, sep='\n')
 
-def main(args):
+def run_model(args):
     list_of_pairs = []
     nextProtected = True
     BASE_PATH = args[0] #"D:/IntelliJ_Workspace/fairER/data/er_magellan/Structured/"
@@ -201,20 +214,19 @@ def main(args):
     threshold = float(args[4])
     ranking_mode = args[7]
     matching_algorithm = args[8]
-    data_assessment = int(args[1]) #0: 'none', 1: 'Dynamic Distribution with Fixed Number of Groups'
     # gpu = [int(i) for i in args[9].split("_")]
     # print("gpu: ", gpu)
     incremental_clusters = []
-
-    if (data_assessment > 0):
-        if(ranking_mode != 'm-fair'):
-            print("ERROR: Data Assessment component is just able for 'm-fair' ranking mode!")
-            sys.exit()
-        if(matching_algorithm != 'ditto'):
-            print("ERROR: Data Assessment component is just able for 'ditto' matching mode!")
-            sys.exit()
-
-
+    try:
+        socket = args[9]
+    except IndexError:
+        socket = None
+        pass
+    
+    #if matching_algorithm == 'ditto':
+        #install_and_import('transformers==3.4.0')
+    #if matching_algorithm == 'gnem':
+        #install_and_import('transformers==2.8.0')
 
     results = {"top-5":[], "top-10":[],	"top-15":[], "top-20":[], "time_to_match":[], "time_to_rank":[], "total_time":[], "PPVP":[], "TPRP":[], "Bias":[]}
 
@@ -244,8 +256,6 @@ def main(args):
 
     list_of_pairs = []
 
-    increment = 0
-    pairs_processed = 0
     while ((not pairs_to_compare.empty) and (init < pair_size)):#for i in range(0,len(preds.index)):
         lines = pairs_to_compare.loc[init:min(n_batches, pair_size)]
         reference = labed_file[0:min(n_batches, pair_size)]
@@ -260,21 +270,14 @@ def main(args):
         print("pairs size: " + str(len(lines.index)))
         # n_batches = n_batches + (window)
 
-        #perform data assessment and define the groups
-        groups_data_assessment = []
-        # if (data_assessment == 1): #if data assessment is required
-        #     groups_data_assessment = data_assessment_menager.get_groups(lines, task)
-
         #call to match
 
         if (matching_algorithm == 'ditto'):
             #PERFORM DITTO
-            pairs_processed = pairs_processed + len(list_of_pairs)
             print('RUNNING DITTO')
-            clusters, preds, av_time, nextProtected, time_to_match, time_to_rank = match_rank_streaming(task, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking, ranking_mode, groups_data_assessment)
+            clusters, preds, av_time, nextProtected, time_to_match, time_to_rank = match_rank_streaming(task, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking, ranking_mode)
         elif (matching_algorithm == 'gnem'):
             #PERFORM GNEM
-            pairs_processed = pairs_processed + len(lines)
             print('RUNNING GNEM')
             clusters, av_time, nextProtected, time_to_match, time_to_rank = match_gnem_rank_streaming(task, lines, nextProtected, model, embed_model, criterion, k_ranking, ranking_mode)
         else:
@@ -299,23 +302,17 @@ def main(args):
 
         print('clusters:')
         print(incremental_clusters)
+        if socket != None:
+            socket.emit("response", {"data": incremental_clusters})
 
         #evaluate effectivenss and fairness
         perform_evaluation(task, incremental_clusters, reference, results, ranking_mode)
 
-        increment += 1
-        print("Increments processed: " + str(increment))
-        print("Pairs (processed): " + str(pairs_processed))
-        print("time_to_match: " + str(results["time_to_match"]))
-        print("time_to_rank: " + str(results["time_to_rank"]))
-        print("total_time: " + str(results["total_time"]))
-
         time.sleep(int(args[6]))
-
     print(results)
     file.close()
 
-if __name__ == '__main__':
-    args = sys.argv[1:]
-    print(args)
-    main(args)
+# if __name__ == '__main__':
+#     args = sys.argv[1:]
+#     print(args)
+#     main(args)

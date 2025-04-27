@@ -1,5 +1,6 @@
 import time
 
+# import data_distribution_assessment.data_assessment_menager
 import data_sender
 from decompose_col_val import decompose_srt_to_full_df, format_gnem_output_to_df
 # from matching import run_deepmatcher as dm
@@ -245,7 +246,7 @@ def cartesian_product(source, target):
     return [[s,t] for s in format_source for t in format_target]
 
 
-def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results, config, model, threshold, summarizer, dk_injector, lm, ranking_mode):
+def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results, config, model, threshold, summarizer, dk_injector, lm, ranking_mode, groups_data_assessment):
     ###########
     # Matching with Ditto
     ###########
@@ -271,13 +272,17 @@ def run_matching_ranking_streaming(data, list_of_pairs, nextProtected, k_results
 
     if len(preds) > 0:
         preds = preds.sort_values(by='match_score', ascending=False)
-
+        groups_data_assessment = []
         column_key = getKey(data)
-
-        initial_pairs = [(a.__getattribute__('left_' + column_key), a.__getattribute__('right_' + column_key),
-                          a.match_score, (util.pair_is_protected_by_group(a, data, False) if ranking_mode == 'm-fair' or ranking_mode == 'none'
-                                          else util.pair_is_protected(a, data, False)))
-                         for a in preds.itertuples(index=False)] #Ditto
+        if not groups_data_assessment: #if groups_data_assessment is empty
+            initial_pairs = [(a.__getattribute__('left_' + column_key), a.__getattribute__('right_' + column_key),
+                              a.match_score, (util.pair_is_protected_by_group(a, data, False) if ranking_mode == 'm-fair' or ranking_mode == 'none'
+                                              else util.pair_is_protected(a, data, False)))
+                             for a in preds.itertuples(index=False)] #Ditto
+        # else: #data_assessment is active
+        #     initial_pairs = [(a.__getattribute__('left_' + column_key), a.__getattribute__('right_' + column_key),
+        #                       a.match_score, data_distribution_assessment.data_assessment_menager.define_group_index(groups_data_assessment, a, data))
+        #                      for a in preds.itertuples(index=False)] #Ditto
 
         if ranking_mode == 'none':
             print("Skipping Ranking Step!")

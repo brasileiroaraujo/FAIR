@@ -61,14 +61,14 @@ def match_streaming(data, data_frame, nextProtected):
 
     return clusters, preds, av_time, nextProtected
 
-def match_rank_streaming(data, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking, ranking_mode):
+def match_rank_streaming(data, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking, ranking_mode, groups_data_assessment=[]):
     print('\n', 'Streaming processing ... ' + data, '\n')
     # data_path = os.path.join(BASE_PATH, 'resources','Datasets',data)
 
     av_time = 0
     # for _ in range(10):
     start_time = time.time()
-    clusters, preds, nextProtected, time_to_match, time_to_rank = run_matching_ranking_streaming(data=data, list_of_pairs=list_of_pairs, nextProtected=nextProtected, k_results=k_ranking, config=config, model=model, threshold=threshold, summarizer=summarizer, dk_injector=dk_injector, lm=lm, ranking_mode=ranking_mode)
+    clusters, preds, nextProtected, time_to_match, time_to_rank = run_matching_ranking_streaming(data=data, list_of_pairs=list_of_pairs, nextProtected=nextProtected, k_results=k_ranking, config=config, model=model, threshold=threshold, summarizer=summarizer, dk_injector=dk_injector, lm=lm, ranking_mode=ranking_mode, groups_data_assessment=groups_data_assessment)
     ex_time = time.time() - start_time
     av_time += ex_time
 
