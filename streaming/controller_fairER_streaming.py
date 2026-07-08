@@ -5,7 +5,7 @@ import sys
 import evaluation.accuracy as eval
 import evaluation.fairness as f_eval
 from streaming.fairER_streaming import run, run_streaming, run_matching_ranking_streaming, \
-    run_matching_gnem_ranking_streaming
+    run_matching_gnem_ranking_streaming, run_matching_ranking_streaming_explanation
 
 # import web.library.methods as methods
 
@@ -73,6 +73,19 @@ def match_rank_streaming(data, list_of_pairs, nextProtected, config, model, thre
     av_time += ex_time
 
     return clusters, preds, av_time, nextProtected, time_to_match, time_to_rank
+
+def match_rank_streaming_explantion(data, list_of_pairs, nextProtected, config, model, threshold, summarizer, dk_injector, lm, k_ranking, ranking_mode, explanation_flag, groups_data_assessment=[], global_topk=[]):
+    print('\n', 'Streaming processing ... ' + data, '\n')
+    # data_path = os.path.join(BASE_PATH, 'resources','Datasets',data)
+
+    av_time = 0
+    # for _ in range(10):
+    start_time = time.time()
+    clusters, preds, nextProtected, time_to_match, time_to_rank, exp, time_to_explain = run_matching_ranking_streaming_explanation(data=data, list_of_pairs=list_of_pairs, nextProtected=nextProtected, k_results=k_ranking, config=config, model=model, threshold=threshold, summarizer=summarizer, dk_injector=dk_injector, lm=lm, ranking_mode=ranking_mode, groups_data_assessment=groups_data_assessment, global_topk=global_topk, explanation_flag=explanation_flag)
+    ex_time = time.time() - start_time
+    av_time += ex_time
+
+    return clusters, preds, av_time, nextProtected, time_to_match, time_to_rank, exp, time_to_explain
 
 def match_gnem_rank_streaming(data, list_of_pairs, nextProtected, model, embed_model, criterion, k_ranking, ranking_mode):
     print('\n', 'Streaming processing ... ' + data, '\n')
