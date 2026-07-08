@@ -33,26 +33,27 @@ config, model, threshold, summarizer, dk_injector = setUpDitto(task="Structured/
 
 df1 = pd.read_csv('D:/IntelliJ_Workspace/GNEM/data/amazon_google/tableA.csv')
 df2 = pd.read_csv('D:/IntelliJ_Workspace/GNEM/data/amazon_google/tableB.csv')
-test_id_pairs = pd.read_csv('D:/IntelliJ_Workspace/GNEM/data/amazon_google/test.csv')
+test_id_pairs = pd.read_csv('D:/IntelliJ_Workspace/GNEM/data/amazon_google/test_lemon.csv')
 test_id_pairs = test_id_pairs.rename(columns={'ltable_id': 'a.rid', 'rtable_id': 'b.rid'})
 test_id_pairs = test_id_pairs.drop(columns=['label'])
 test_id_pairs.index.name = "pid"
 
 # print(m.ditto_predict_proba(df1, df2, test_id_pairs.iloc[0:2], model))
 
-print("TEST SET")
-print(test_id_pairs.iloc[0:2])
+# print("TEST SET")
+# print(test_id_pairs.iloc[0:2])
 
 exp = lemon.explain(
     df1,
     df2,
     test_id_pairs.iloc[0:2],
     lambda a, b, p: m.ditto_predict_proba(a, b, p, model=model),
-    granularity="attributes"
+    granularity="attributes",
+    # estimate_potential=False
+    # token_representation="independent"
     # explain_attrs=True
     # dual_explanation=False
-    # attribution_method="shap",
-    # estimate_potential=False
+    # attribution_method="lime",
 )
 
 for item in exp.values():
@@ -70,7 +71,8 @@ for item in exp.values():
     print("----------------")
 
     print(item.as_html())
-    ax, plt = item.plot_treats("both")
-    plt.show()
+    # ax, plt = item.plot_treats("both")
+    # plt.show()
+    print("======================")
 
 
